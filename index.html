@@ -208,6 +208,15 @@
   .qscoretext{font-size:21px;font-weight:900;letter-spacing:-.03em}
   .qstage .qlevels{width:min(340px,100%)}
 
+  @media (max-height:620px){
+    .qstage{gap:5px;justify-content:flex-start;padding-top:10px}
+    .qeq{font-size:32px}
+    .qhint{font-size:20px;min-height:28px}
+    .qopts{width:min(300px,100%);gap:8px}
+    .qopt{font-size:28px;aspect-ratio:1.9}
+    .qbig{font-size:44px}
+  }
+
 </style>
 </head>
 <body>
@@ -230,13 +239,13 @@
        JS가 실행되면 renderTabs()/renderGrid()가 같은 내용으로 덮어쓴다. -->
   <nav class="tabs" id="tabs" aria-label="도안 카테고리">
     <button class="tab on" data-cat="dino"><span class="em">🦖</span>공룡·동물</button>
+    <button class="tab" data-cat="hangul"><span class="em">🇰🇷</span>한글</button>
+    <button class="tab" data-cat="abc"><span class="em">🔤</span>알파벳</button>
+    <button class="tab" data-cat="math"><span class="em">🔢</span>숫자·연산</button>
     <button class="tab" data-cat="car"><span class="em">🚗</span>탈것</button>
     <button class="tab" data-cat="xmas"><span class="em">🎄</span>크리스마스</button>
     <button class="tab" data-cat="tale"><span class="em">👑</span>동화·자연</button>
     <button class="tab" data-cat="magic"><span class="em">🪄</span>요정·로봇</button>
-    <button class="tab" data-cat="hangul"><span class="em">🇰🇷</span>한글</button>
-    <button class="tab" data-cat="abc"><span class="em">🔤</span>알파벳</button>
-    <button class="tab" data-cat="math"><span class="em">🔢</span>숫자·연산</button>
   </nav>
   <main class="grid" id="grid">
     <button class="card" data-id="trex" aria-label="티라노사우루스 색칠하기"><span class="thumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="티라노사우루스 도안"><path d="M298 210 C 348 202 366 162 374 116 C 396 176 378 250 304 274 Z" fill="#ffffff" data-colorable="true"/><rect x="166" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/><rect x="240" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/><ellipse cx="191" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/><ellipse cx="265" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/><ellipse cx="228" cy="208" rx="88" ry="86" fill="#ffffff" data-colorable="true"/><ellipse cx="232" cy="262" rx="58" ry="30" fill="#ffffff" data-colorable="true"/><path d="M214 134 L 228 100 L 250 130 Z" fill="#ffffff" data-colorable="true"/><path d="M256 138 L 272 108 L 290 140 Z" fill="#ffffff" data-colorable="true"/><ellipse cx="144" cy="126" rx="78" ry="66" fill="#ffffff" data-colorable="true"/><ellipse cx="148" cy="250" rx="13" ry="19" transform="rotate(28 148 250)" fill="#ffffff" data-colorable="true"/><path d="M72 134 C 106 154 142 156 172 144 C 168 180 118 190 92 172 C 78 162 72 148 72 134 Z" fill="#ffffff" data-colorable="true"/><path d="M108 150 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/><path d="M138 152 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/><circle cx="118" cy="94" r="17" fill="#ffffff" data-colorable="true"/><circle cx="116" cy="97" r="7" fill="#1e293b" stroke="none" data-colorable="false"/><circle cx="82" cy="118" r="4.5" fill="#1e293b" stroke="none" data-colorable="false"/></svg></span><span class="cname">티라노사우루스</span></button>
@@ -312,13 +321,13 @@
 
   var CATEGORIES = [
     {id:'dino', emoji:'🦖', name:'공룡·동물'},
+    {id:'hangul', emoji:'🇰🇷', name:'한글'},
+    {id:'abc', emoji:'🔤', name:'알파벳'},
+    {id:'math', emoji:'🔢', name:'숫자·연산'},
     {id:'car',  emoji:'🚗', name:'탈것'},
     {id:'xmas', emoji:'🎄', name:'크리스마스'},
     {id:'tale', emoji:'👑', name:'동화·자연'},
-    {id:'magic', emoji:'🪄', name:'요정·로봇'},
-    {id:'hangul', emoji:'🇰🇷', name:'한글'},
-    {id:'abc', emoji:'🔤', name:'알파벳'},
-    {id:'math', emoji:'🔢', name:'숫자·연산'}
+    {id:'magic', emoji:'🪄', name:'요정·로봇'}
   ];
 
   var COLORS = [
