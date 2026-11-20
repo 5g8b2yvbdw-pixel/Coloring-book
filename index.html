@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#eaf5ff">
@@ -10,7 +10,16 @@
 <title>🎨 신나는 색칠놀이</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{-webkit-text-size-adjust:100%}
+  /* ---------- 모바일 확대(더블탭 줌·핀치 줌) 방지 ---------- */
+  /* iOS Safari 는 user-scalable=no 만으로는 더블탭 줌을 막지 못한다. touch-action:manipulation 은
+     스크롤·드래그는 그대로 두고 더블탭 줌만 끄는 속성이라 루트와 모든 조작 요소에 둔다. */
+  html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+  html,body{-webkit-user-select:none;user-select:none}
+  button,a,.tab,.card,.icbtn,.sw,.seg button,.qlv,.qopt,.tools,.topbar,.modal,.sheet,
+  #gallery,#studio,#quiz{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  /* 크레파스 드로잉 영역(.stage·#brush)만 아래 규칙에서 touch-action:none 으로 브라우저 제스처를
+     모두 끈다(그리기 우선). 갤러리 세로 스크롤과 카테고리 가로 스크롤은 위의 manipulation 이
+     pan 을 허용하므로 그대로 동작한다. */
   body{
     margin:0;min-height:100dvh;color:#1e293b;
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;
@@ -2010,6 +2019,44 @@
   window.addEventListener('orientationchange', function(){
     setTimeout(function(){ if(!studioEl.classList.contains('hidden')) fitArt(); }, 260);
   });
+
+  /* ============ 모바일 확대(더블탭 줌·핀치 줌) 방지 ============ */
+  /* 1차 방어선은 CSS touch-action:manipulation 이다. iOS Safari 가 드물게 이를 무시하는
+     경우를 위해 여기서 한 번 더 막는다. 다만 두 번째 탭이 버튼·색칠 영역·캔버스에 떨어지면
+     preventDefault() 를 하지 않는다 — iOS 는 touchend 를 취소하면 뒤따르는 click/tap 까지
+     같이 삼키므로, 채우기 연속 터치·크레파스 드로잉·버튼 클릭이 씹히면 안 되기 때문이다.
+     (그 영역들은 이미 touch-action:manipulation / none 으로 확대가 막혀 있다.) */
+  var lastTapAt = 0, lastTapX = 0, lastTapY = 0;
+
+  function isTapActionable(node){
+    if(!node) return false;
+    if(node.closest) return !!node.closest('button, a, input, select, textarea, canvas, [data-colorable]');
+    return false;
+  }
+
+  document.addEventListener('touchend', function(e){
+    if(e.touches && e.touches.length) return;                     // 손가락이 더 남아 있으면 무시
+    if(e.changedTouches && e.changedTouches.length > 1) return;    // 핀치(멀티터치)는 대상 아님
+    var t = e.changedTouches && e.changedTouches[0];
+    if(!t) return;
+    var now = Date.now();
+    var dt = now - lastTapAt;
+    var near = Math.abs(t.clientX - lastTapX) < 40 && Math.abs(t.clientY - lastTapY) < 40;
+    var isDoubleTap = (dt > 0 && dt < 300 && near);
+    lastTapAt = now; lastTapX = t.clientX; lastTapY = t.clientY;
+    if(!isDoubleTap) return;
+    lastTapAt = 0;                                                 // 세 번째 탭부터 다시 계산
+    if(isTapActionable(e.target)) return;                          // 탭은 그대로 살린다
+    e.preventDefault();                                            // 빈 배경의 더블탭 줌만 차단
+  }, {passive:false});
+
+  // 핀치 줌 차단: iOS 전용 gesture 이벤트 + 두 손가락 touchmove
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function(name){
+    document.addEventListener(name, function(e){ e.preventDefault(); }, {passive:false});
+  });
+  document.addEventListener('touchmove', function(e){
+    if(e.touches && e.touches.length > 1) e.preventDefault();
+  }, {passive:false});
 
   /* ============ 연산 놀이 (숫자·연산 탭) ============ */
   var quizEl = document.getElementById('quiz');
