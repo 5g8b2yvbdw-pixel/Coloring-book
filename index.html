@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#eaf5ff">
+<meta name="format-detection" content="telephone=no">
+<title>🎨 신나는 색칠놀이</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;min-height:100dvh;color:#1e293b;
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;
+    background:linear-gradient(165deg,#eaf5ff 0%,#f2ecff 42%,#fff0f7 100%);
+    background-attachment:fixed;
+    -webkit-user-select:none;user-select:none;
+    overscroll-behavior:none;
+  }
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  .hidden{display:none!important}
+
+  /* ---------- 미리보기 안내 배너 ---------- */
+  #jsBanner{
+    display:flex;align-items:flex-start;gap:9px;
+    margin:0 0 14px;padding:14px 16px;border-radius:20px;
+    background:#fff7ed;border:2px solid #fdba74;color:#9a3412;
+    font-size:14.5px;font-weight:700;letter-spacing:-.02em;line-height:1.5;
+    box-shadow:0 6px 16px rgba(249,115,22,.18);
+  }
+  #jsBanner .jb-ico{font-size:20px;line-height:1.35;flex:0 0 auto}
+  #jsBanner .jb-txt{flex:1 1 auto;min-width:0}
+  #jsBanner b{font-weight:900}
+
+  /* ---------- 갤러리 ---------- */
+  #gallery{padding:18px 14px calc(28px + env(safe-area-inset-bottom));max-width:900px;margin:0 auto}
+  .hero h1{margin:4px 0 6px;font-size:27px;letter-spacing:-.035em}
+  .hero p{margin:0 0 14px;font-size:14px;color:#64748b;font-weight:700}
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    flex:0 0 auto;display:flex;align-items:center;gap:7px;
+    font-size:15px;font-weight:800;letter-spacing:-.02em;color:#64748b;
+    padding:11px 17px;border-radius:999px;background:#fff;
+    box-shadow:0 3px 10px rgba(30,41,59,.09);white-space:nowrap;transition:background .15s,color .15s;
+  }
+  .tab.on{background:#1e293b;color:#fff;box-shadow:0 8px 18px rgba(30,41,59,.28)}
+  .tab .em{font-size:17px;line-height:1}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px}
+  .card{
+    display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px;
+    background:#fff;border-radius:26px;transition:transform .12s ease;
+    box-shadow:0 5px 0 rgba(30,41,59,.06),0 12px 26px rgba(30,41,59,.08);
+  }
+  .card:active{transform:scale(.955)}
+  .thumb{display:block;width:100%;aspect-ratio:1}
+  .thumb svg{display:block;width:100%;height:100%;stroke-width:7px}
+  .cname{font-size:14px;font-weight:800;letter-spacing:-.02em;padding-bottom:2px}
+  .foot{margin-top:20px;text-align:center;font-size:12.5px;font-weight:700;color:#94a3b8}
+
+  /* ---------- 색칠 화면 ---------- */
+  #studio{position:fixed;inset:0;display:flex;flex-direction:column;background:linear-gradient(180deg,#eaf5ff 0%,#f5efff 100%)}
+  .topbar{
+    display:flex;align-items:center;gap:7px;
+    padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));
+  }
+  .icbtn{
+    flex:0 0 auto;width:42px;height:42px;border-radius:15px;background:#fff;
+    font-size:19px;line-height:1;display:grid;place-items:center;
+    box-shadow:0 2px 8px rgba(30,41,59,.12);transition:transform .1s ease,opacity .15s;
+  }
+  .icbtn.wide{width:auto;padding:0 13px;font-size:14px;font-weight:800;letter-spacing:-.03em}
+  .icbtn:active{transform:scale(.92)}
+  .icbtn[disabled]{opacity:.35}
+  .stitle{
+    flex:1 1 auto;min-width:0;text-align:center;font-size:16px;font-weight:800;letter-spacing:-.03em;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;
+  }
+  .stage{flex:1 1 auto;min-height:0;display:grid;place-items:center;padding:2px 10px 6px;touch-action:none}
+  .art{
+    position:relative;width:300px;height:300px;background:#fff;border-radius:26px;overflow:hidden;
+    isolation:isolate;box-shadow:0 12px 30px rgba(30,41,59,.13);
+  }
+  .slot{position:absolute;inset:0}
+  .slot svg{display:block;width:100%;height:100%}
+  .slot svg [data-colorable]{transition:fill .14s ease}
+  #brush{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;mix-blend-mode:multiply}
+  #brush.off{pointer-events:none}
+
+  /* ---------- 도구 막대 ---------- */
+  .tools{
+    flex:0 0 auto;padding:10px 12px calc(12px + env(safe-area-inset-bottom));
+    background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -8px 26px rgba(30,41,59,.12);
+  }
+  .modes{display:flex;align-items:center;gap:8px}
+  .seg{flex:1 1 auto;display:flex;gap:5px;padding:4px;background:#f1f5f9;border-radius:17px;min-width:0}
+  .seg button{
+    flex:1 1 0;min-width:0;padding:10px 4px;border-radius:13px;font-size:14.5px;font-weight:800;
+    letter-spacing:-.03em;color:#64748b;white-space:nowrap;transition:background .15s,color .15s;
+  }
+  .seg button.on{background:#fff;color:#1e293b;box-shadow:0 2px 8px rgba(30,41,59,.16)}
+  .sizes{display:none;gap:6px;flex:0 0 auto}
+  .tools.brush .sizes{display:flex}
+  .tools.brush .seg button{font-size:13.5px}
+  .sizes button{
+    width:40px;height:40px;border-radius:13px;background:#f8fafc;border:2px solid #e2e8f0;
+    display:grid;place-items:center;transition:border-color .15s,background .15s;
+  }
+  .sizes button.on{border-color:#1e293b;background:#fff}
+  .dot{display:block;border-radius:50%;background:#1e293b}
+  .palette{display:grid;grid-template-columns:repeat(9,1fr);gap:7px;margin-top:9px}
+  .sw{
+    position:relative;aspect-ratio:1;border-radius:50%;padding:0;
+    box-shadow:inset 0 0 0 3px #fff,0 0 0 2px #e2e8f0;
+    transition:transform .12s ease,box-shadow .15s;
+  }
+  .sw:active{transform:scale(.9)}
+  .sw.on{box-shadow:inset 0 0 0 3px #fff,0 0 0 3px #1e293b;transform:scale(1.08)}
+  .sw.erase{background:#fff;font-size:16px;display:grid;place-items:center;line-height:1}
+
+  /* ---------- 모달 / 토스트 ---------- */
+  .modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:26px;background:rgba(15,23,42,.45);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .sheet{width:min(320px,100%);padding:24px 20px 18px;background:#fff;border-radius:26px;text-align:center;box-shadow:0 24px 60px rgba(15,23,42,.35)}
+  .sheet p{margin:0 0 18px;font-size:16px;font-weight:800;letter-spacing:-.02em}
+  .sheet .row{display:flex;gap:10px}
+  .sheet .row button{flex:1 1 0;padding:13px 0;border-radius:15px;font-size:15px;font-weight:800}
+  #cancelClear{background:#f1f5f9;color:#475569}
+  #confirmClear{background:#ef4444;color:#fff;box-shadow:0 6px 14px rgba(239,68,68,.35)}
+  .toast{
+    position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));z-index:60;
+    padding:12px 20px;border-radius:999px;background:#1e293b;color:#fff;
+    font-size:14px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;
+    opacity:0;transform:translate(-50%,16px);pointer-events:none;transition:opacity .22s,transform .22s;
+    box-shadow:0 10px 26px rgba(15,23,42,.35);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (min-width:700px){
+    .hero h1{font-size:31px}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+    .cname{font-size:15px}
+    .tools{max-width:640px;margin:0 auto;border-radius:26px;margin-bottom:12px}
+    .palette{grid-template-columns:repeat(17,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 갤러리 ================= -->
+<div id="gallery">
+
+  <!-- JS 차단(QuickLook 미리보기) 환경 안내: 스크립트가 실행되면 즉시 숨겨진다 -->
+  <div id="jsBanner" role="note">
+    <span class="jb-ico" aria-hidden="true">📱</span>
+    <span class="jb-txt"><b>미리보기에서는 색칠하기가 안 돼요!</b><br>공유 버튼(⬆️) → <b>'Safari로 열기'</b>를 눌러주세요.</span>
+  </div>
+  <script>document.getElementById('jsBanner').style.display = 'none';</script>
+
+  <header class="hero">
+    <h1>🎨 신나는 색칠놀이</h1>
+    <p>마음에 드는 그림을 골라서 톡톡 칠해보세요!</p>
+  </header>
+  <!-- JS가 실행되지 않는 미리보기에서도 첫 화면이 보이도록 정적 HTML로 미리 그려 둔다.
+       JS가 실행되면 renderTabs()/renderGrid()가 같은 내용으로 덮어쓴다. -->
+  <nav class="tabs" id="tabs" aria-label="도안 카테고리">
+    <button class="tab on" data-cat="dino"><span class="em">🦖</span>공룡·동물</button>
+    <button class="tab" data-cat="car"><span class="em">🚗</span>탈것</button>
+    <button class="tab" data-cat="xmas"><span class="em">🎄</span>크리스마스</button>
+    <button class="tab" data-cat="tale"><span class="em">👑</span>동화·자연</button>
+  </nav>
+  <main class="grid" id="grid">
+    <button class="card" data-id="trex" aria-label="티라노사우루스 색칠하기"><span class="thumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="티라노사우루스 도안"><path d="M298 210 C 348 202 366 162 374 116 C 396 176 378 250 304 274 Z" fill="#ffffff" data-colorable="true"/><rect x="166" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/><rect x="240" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/><ellipse cx="191" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/><ellipse cx="265" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/><ellipse cx="228" cy="208" rx="88" ry="86" fill="#ffffff" data-colorable="true"/><ellipse cx="232" cy="262" rx="58" ry="30" fill="#ffffff" data-colorable="true"/><path d="M214 134 L 228 100 L 250 130 Z" fill="#ffffff" data-colorable="true"/><path d="M256 138 L 272 108 L 290 140 Z" fill="#ffffff" data-colorable="true"/><ellipse cx="144" cy="126" rx="78" ry="66" fill="#ffffff" data-colorable="true"/><ellipse cx="148" cy="250" rx="13" ry="19" transform="rotate(28 148 250)" fill="#ffffff" data-colorable="true"/><path d="M72 134 C 106 154 142 156 172 144 C 168 180 118 190 92 172 C 78 162 72 148 72 134 Z" fill="#ffffff" data-colorable="true"/><path d="M108 150 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/><path d="M138 152 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/><circle cx="118" cy="94" r="17" fill="#ffffff" data-colorable="true"/><circle cx="116" cy="97" r="7" fill="#1e293b" stroke="none" data-colorable="false"/><circle cx="82" cy="118" r="4.5" fill="#1e293b" stroke="none" data-colorable="false"/></svg></span><span class="cname">티라노사우루스</span></button>
+    <button class="card" data-id="brachio" aria-label="브라키오사우루스 색칠하기"><span class="thumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="브라키오사우루스 도안"><path d="M298 258 C 348 250 372 226 382 196 C 394 240 372 288 326 302 Z" fill="#ffffff" data-colorable="true"/><path d="M170 264 C 152 196 164 130 184 84 L 228 98 C 218 150 220 206 242 258 Z" fill="#ffffff" data-colorable="true"/><ellipse cx="222" cy="266" rx="106" ry="68" fill="#ffffff" data-colorable="true"/><rect x="138" y="300" width="40" height="72" rx="20" fill="#ffffff" data-colorable="true"/><rect x="198" y="306" width="40" height="68" rx="20" fill="#ffffff" data-colorable="true"/><rect x="256" y="306" width="40" height="68" rx="20" fill="#ffffff" data-colorable="true"/><rect x="308" y="300" width="36" height="72" rx="18" fill="#ffffff" data-colorable="true"/><ellipse cx="194" cy="76" rx="56" ry="35" fill="#ffffff" data-colorable="true"/><circle cx="300" cy="250" r="11" fill="#ffffff" data-colorable="true"/><circle cx="262" cy="290" r="9" fill="#ffffff" data-colorable="true"/><circle cx="188" cy="166" r="9" fill="#ffffff" data-colorable="true"/><circle cx="204" cy="218" r="8" fill="#ffffff" data-colorable="true"/><circle cx="212" cy="66" r="11" fill="#ffffff" data-colorable="true"/><circle cx="213" cy="67" r="5" fill="#1e293b" stroke="none" data-colorable="false"/><circle cx="156" cy="62" r="4" fill="#1e293b" stroke="none" data-colorable="false"/><path d="M148 92 q 18 12 36 4" fill="none"/></svg></span><span class="cname">브라키오사우루스</span></button>
+    <button class="card" data-id="cat" aria-label="고양이 색칠하기"><span class="thumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="고양이 도안"><path d="M258 328 C 318 332 350 292 336 250 C 358 292 340 352 264 348 Z" fill="#ffffff" data-colorable="true"/><path d="M134 222 C 122 296 154 346 200 346 C 246 346 278 296 266 222 Z" fill="#ffffff" data-colorable="true"/><ellipse cx="168" cy="338" rx="28" ry="16" fill="#ffffff" data-colorable="true"/><ellipse cx="236" cy="338" rx="28" ry="16" fill="#ffffff" data-colorable="true"/><path d="M136 108 L 120 28 L 202 74 Z" fill="#ffffff" data-colorable="true"/><path d="M270 108 L 286 28 L 204 74 Z" fill="#ffffff" data-colorable="true"/><path d="M146 100 L 136 48 L 188 78 Z" fill="#ffffff" data-colorable="true"/><path d="M260 100 L 270 48 L 218 78 Z" fill="#ffffff" data-colorable="true"/><circle cx="203" cy="158" r="84" fill="#ffffff" data-colorable="true"/><ellipse cx="172" cy="148" rx="17" ry="20" fill="#ffffff" data-colorable="true"/><ellipse cx="234" cy="148" rx="17" ry="20" fill="#ffffff" data-colorable="true"/><ellipse cx="172" cy="151" rx="8" ry="10" fill="#1e293b" stroke="none" data-colorable="false"/><ellipse cx="234" cy="151" rx="8" ry="10" fill="#1e293b" stroke="none" data-colorable="false"/><path d="M192 180 L 214 180 L 203 193 Z" fill="#ffffff" data-colorable="true"/><path d="M203 193 q -10 15 -23 5" fill="none"/><path d="M203 193 q 10 15 23 5" fill="none"/><circle cx="146" cy="186" r="13" fill="#ffffff" data-colorable="true"/><circle cx="260" cy="186" r="13" fill="#ffffff" data-colorable="true"/><path d="M120 164 L 74 154" fill="none"/><path d="M118 180 L 70 180" fill="none"/><path d="M122 196 L 76 206" fill="none"/><path d="M286 164 L 332 154" fill="none"/><path d="M288 180 L 336 180" fill="none"/><path d="M284 196 L 330 206" fill="none"/></svg></span><span class="cname">고양이</span></button>
+    <button class="card" data-id="rabbit" aria-label="토끼 색칠하기"><span class="thumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="토끼 도안"><ellipse cx="164" cy="90" rx="28" ry="74" transform="rotate(-12 164 90)" fill="#ffffff" data-colorable="true"/><ellipse cx="238" cy="90" rx="28" ry="74" transform="rotate(12 238 90)" fill="#ffffff" data-colorable="true"/><ellipse cx="164" cy="94" rx="13" ry="50" transform="rotate(-12 164 94)" fill="#ffffff" data-colorable="true"/><ellipse cx="238" cy="94" rx="13" ry="50" transform="rotate(12 238 94)" fill="#ffffff" data-colorable="true"/><ellipse cx="200" cy="318" rx="82" ry="64" fill="#ffffff" data-colorable="true"/><ellipse cx="154" cy="352" rx="30" ry="16" fill="#ffffff" data-colorable="true"/><ellipse cx="246" cy="352" rx="30" ry="16" fill="#ffffff" data-colorable="true"/><ellipse cx="200" cy="206" rx="78" ry="70" fill="#ffffff" data-colorable="true"/><ellipse cx="174" cy="198" rx="16" ry="19" fill="#ffffff" data-colorable="true"/><ellipse cx="226" cy="198" rx="16" ry="19" fill="#ffffff" data-colorable="true"/><ellipse cx="174" cy="201" rx="7.5" ry="9" fill="#1e293b" stroke="none" data-colorable="false"/><ellipse cx="226" cy="201" rx="7.5" ry="9" fill="#1e293b" stroke="none" data-colorable="false"/><path d="M192 228 L 208 228 L 200 238 Z" fill="#ffffff" data-colorable="true"/><path d="M200 238 q -9 13 -20 4" fill="none"/><path d="M200 238 q 9 13 20 4" fill="none"/><circle cx="152" cy="230" r="12" fill="#ffffff" data-colorable="true"/><circle cx="248" cy="230" r="12" fill="#ffffff" data-colorable="true"/><path d="M120 214 L 76 204" fill="none"/><path d="M118 230 L 72 230" fill="none"/><path d="M120 246 L 76 256" fill="none"/><path d="M280 214 L 324 204" fill="none"/><path d="M282 230 L 328 230" fill="none"/><path d="M280 246 L 324 256" fill="none"/></svg></span><span class="cname">토끼</span></button>
+  </main>
+  <p class="foot" id="foot">도안 17개 · 손가락으로 톡톡 칠해요 🖍️</p>
+</div>
+
+<!-- ================= 색칠 화면 ================= -->
+<div id="studio" class="hidden">
+  <div class="topbar">
+    <button class="icbtn wide" id="backBtn" aria-label="다른 도안 고르기" title="다른 도안 고르기">← 도안</button>
+    <div class="stitle" id="studioTitle"></div>
+    <button class="icbtn" id="undoBtn" aria-label="되돌리기" title="되돌리기">↩</button>
+    <button class="icbtn" id="resetBtn" aria-label="다시 칠하기" title="다시 칠하기">🗑</button>
+    <button class="icbtn" id="saveBtn" aria-label="그림 저장" title="그림 저장">💾</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="art" id="art">
+      <div class="slot" id="svgSlot"></div>
+      <canvas id="brush" class="off"></canvas>
+    </div>
+  </div>
+
+  <div class="tools" id="tools">
+    <div class="modes">
+      <div class="seg" id="seg">
+        <button data-mode="fill" class="on">🪣 채우기</button>
+        <button data-mode="brush">🖍️ 크레파스</button>
+      </div>
+      <div class="sizes" id="sizes">
+        <button data-size="0" aria-label="얇게"><span class="dot" style="width:7px;height:7px"></span></button>
+        <button data-size="1" class="on" aria-label="보통"><span class="dot" style="width:13px;height:13px"></span></button>
+        <button data-size="2" aria-label="굵게"><span class="dot" style="width:21px;height:21px"></span></button>
+      </div>
+    </div>
+    <div class="palette" id="palette"></div>
+  </div>
+</div>
+
+<div class="modal hidden" id="modal">
+  <div class="sheet">
+    <p>그림을 모두 지울까요?</p>
+    <div class="row">
+      <button id="cancelClear">취소</button>
+      <button id="confirmClear">지우기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ============ 데이터 ============ */
+
+  var BRUSH_W = [0.018, 0.034, 0.055];
+
+  var CATEGORIES = [
+    {id:'dino', emoji:'🦖', name:'공룡·동물'},
+    {id:'car',  emoji:'🚗', name:'탈것'},
+    {id:'xmas', emoji:'🎄', name:'크리스마스'},
+    {id:'tale', emoji:'👑', name:'동화·자연'}
+  ];
+
+  var COLORS = [
+    ['#ef4444','빨강'], ['#f97316','주황'], ['#facc15','노랑'], ['#a3e635','연두'],
+    ['#16a34a','초록'], ['#14b8a6','청록'], ['#38bdf8','하늘'], ['#2563eb','파랑'],
+    ['#8b5cf6','보라'], ['#d946ef','연보라'], ['#f472b6','분홍'], ['#fdba74','살구'],
+    ['#a16207','갈색'], ['#94a3b8','회색'], ['#1e293b','검정'], ['#ffffff','하양']
+  ];
+
+  var DESIGNS = [
+    /* ---------------- 🦖 공룡·동물 ---------------- */
+    {
+      id:'trex', cat:'dino', title:'티라노사우루스',
+      body:
+      '<path d="M298 210 C 348 202 366 162 374 116 C 396 176 378 250 304 274 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="166" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="240" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="191" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="265" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="228" cy="208" rx="88" ry="86" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="232" cy="262" rx="58" ry="30" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M214 134 L 228 100 L 250 130 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M256 138 L 272 108 L 290 140 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="144" cy="126" rx="78" ry="66" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="148" cy="250" rx="13" ry="19" transform="rotate(28 148 250)" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M72 134 C 106 154 142 156 172 144 C 168 180 118 190 92 172 C 78 162 72 148 72 134 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M108 150 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/>' +
+      '<path d="M138 152 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/>' +
+      '<circle cx="118" cy="94" r="17" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="116" cy="97" r="7" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="82" cy="118" r="4.5" fill="#1e293b" stroke="none" data-colorable="false"/>'
+    },
+    {
+      id:'brachio', cat:'dino', title:'브라키오사우루스',
+      body:
+      '<path d="M298 258 C 348 250 372 226 382 196 C 394 240 372 288 326 302 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M170 264 C 152 196 164 130 184 84 L 228 98 C 218 150 220 206 242 258 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="222" cy="266" rx="106" ry="68" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="138" y="300" width="40" height="72" rx="20" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="198" y="306" width="40" height="68" rx="20" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="256" y="306" width="40" height="68" rx="20" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="308" y="300" width="36" height="72" rx="18" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="194" cy="76" rx="56" ry="35" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="300" cy="250" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="262" cy="290" r="9" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="188" cy="166" r="9" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="204" cy="218" r="8" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="212" cy="66" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="213" cy="67" r="5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="156" cy="62" r="4" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<path d="M148 92 q 18 12 36 4" fill="none"/>'
+    },
+    {
+      id:'cat', cat:'dino', title:'고양이',
+      body:
+      '<path d="M258 328 C 318 332 350 292 336 250 C 358 292 340 352 264 348 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M134 222 C 122 296 154 346 200 346 C 246 346 278 296 266 222 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="168" cy="338" rx="28" ry="16" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="236" cy="338" rx="28" ry="16" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M136 108 L 120 28 L 202 74 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M270 108 L 286 28 L 204 74 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M146 100 L 136 48 L 188 78 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M260 100 L 270 48 L 218 78 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="203" cy="158" r="84" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="172" cy="148" rx="17" ry="20" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="234" cy="148" rx="17" ry="20" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="172" cy="151" rx="8" ry="10" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<ellipse cx="234" cy="151" rx="8" ry="10" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<path d="M192 180 L 214 180 L 203 193 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M203 193 q -10 15 -23 5" fill="none"/>' +
+      '<path d="M203 193 q 10 15 23 5" fill="none"/>' +
+      '<circle cx="146" cy="186" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="260" cy="186" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M120 164 L 74 154" fill="none"/><path d="M118 180 L 70 180" fill="none"/><path d="M122 196 L 76 206" fill="none"/>' +
+      '<path d="M286 164 L 332 154" fill="none"/><path d="M288 180 L 336 180" fill="none"/><path d="M284 196 L 330 206" fill="none"/>'
+    },
+    {
+      id:'rabbit', cat:'dino', title:'토끼',
+      body:
+      '<ellipse cx="164" cy="90" rx="28" ry="74" transform="rotate(-12 164 90)" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="238" cy="90" rx="28" ry="74" transform="rotate(12 238 90)" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="164" cy="94" rx="13" ry="50" transform="rotate(-12 164 94)" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="238" cy="94" rx="13" ry="50" transform="rotate(12 238 94)" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="200" cy="318" rx="82" ry="64" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="154" cy="352" rx="30" ry="16" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="246" cy="352" rx="30" ry="16" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="200" cy="206" rx="78" ry="70" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="174" cy="198" rx="16" ry="19" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="226" cy="198" rx="16" ry="19" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="174" cy="201" rx="7.5" ry="9" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<ellipse cx="226" cy="201" rx="7.5" ry="9" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<path d="M192 228 L 208 228 L 200 238 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M200 238 q -9 13 -20 4" fill="none"/>' +
+      '<path d="M200 238 q 9 13 20 4" fill="none"/>' +
+      '<circle cx="152" cy="230" r="12" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="248" cy="230" r="12" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M120 214 L 76 204" fill="none"/><path d="M118 230 L 72 230" fill="none"/><path d="M120 246 L 76 256" fill="none"/>' +
+      '<path d="M280 214 L 324 204" fill="none"/><path d="M282 230 L 328 230" fill="none"/><path d="M280 246 L 324 256" fill="none"/>'
+    },
+
+    /* ---------------- 🚗 탈것 ---------------- */
+    {
+      id:'firetruck', cat:'car', title:'소방차',
+      body:
+      '<rect x="104" y="86" width="196" height="12" rx="6" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="104" y="118" width="196" height="12" rx="6" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M132 86 L 132 130" fill="none" stroke-width="3"/>' +
+      '<path d="M160 86 L 160 130" fill="none" stroke-width="3"/>' +
+      '<path d="M188 86 L 188 130" fill="none" stroke-width="3"/>' +
+      '<path d="M216 86 L 216 130" fill="none" stroke-width="3"/>' +
+      '<path d="M244 86 L 244 130" fill="none" stroke-width="3"/>' +
+      '<path d="M272 86 L 272 130" fill="none" stroke-width="3"/>' +
+      '<rect x="86" y="138" width="54" height="18" rx="9" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="52" y="156" width="126" height="66" rx="12" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="66" y="168" width="58" height="42" rx="9" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="52" y="216" width="304" height="82" rx="14" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="196" y="238" width="96" height="42" rx="10" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="60" y="238" width="60" height="42" rx="10" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="120" cy="300" r="42" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="300" cy="300" r="42" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="120" cy="300" r="15" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="300" cy="300" r="15" fill="#ffffff" data-colorable="true"/>'
+    },
+    {
+      id:'police', cat:'car', title:'경찰차',
+      body:
+      '<rect x="170" y="88" width="76" height="24" rx="10" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M44 276 C 44 244 56 228 88 222 L 138 216 L 180 152 C 190 138 202 132 218 132 L 282 132 C 298 132 312 140 322 154 L 358 218 C 384 226 392 244 392 276 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M196 148 L 262 148 L 262 204 L 180 204 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M272 148 L 322 148 L 346 204 L 272 204 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M44 254 L 392 254" fill="none" stroke-width="3"/>' +
+      '<circle cx="116" cy="286" r="44" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="320" cy="286" r="44" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="116" cy="286" r="17" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="320" cy="286" r="17" fill="#ffffff" data-colorable="true"/>'
+    },
+    {
+      id:'train', cat:'car', title:'기차',
+      body:
+      '<circle cx="120" cy="82" r="26" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="86" cy="118" r="18" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="154" cy="52" r="15" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="94" y="128" width="54" height="48" rx="10" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="250" y="110" width="98" height="176" rx="16" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="54" y="172" width="200" height="114" rx="26" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="268" y="136" width="62" height="54" rx="10" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="54" y="282" width="294" height="24" rx="12" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="112" cy="316" r="30" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="182" cy="316" r="30" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="300" cy="314" r="40" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="112" cy="316" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="182" cy="316" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="300" cy="314" r="14" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M142 316 L 260 316" fill="none" stroke-width="5"/>'
+    },
+    {
+      id:'rocket', cat:'car', title:'로켓',
+      body:
+      '<path d="M200 292 C 234 316 234 352 200 380 C 166 352 166 316 200 292 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M136 236 C 104 254 92 288 98 316 L 140 300 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M264 236 C 296 254 308 288 302 316 L 260 300 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M200 30 C 246 80 264 148 264 214 L 264 300 L 136 300 L 136 214 C 136 148 154 80 200 30 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="164" r="38" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="136" y="266" width="128" height="34" rx="6" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M172 250 L 228 250" fill="none" stroke-width="3"/>' +
+      '<path d="M62 96 L 66 110 L 80 114 L 66 118 L 62 132 L 58 118 L 44 114 L 58 110 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M340 148 L 343 160 L 355 163 L 343 166 L 340 178 L 337 166 L 325 163 L 337 160 Z" fill="#ffffff" data-colorable="true"/>'
+    },
+
+    /* ---------------- 🎄 크리스마스 ---------------- */
+    {
+      id:'santa', cat:'xmas', title:'산타클로스',
+      body:
+      '<path d="M92 400 L 92 374 C 92 332 130 308 200 308 C 270 308 308 332 308 374 L 308 400 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="200" cy="170" rx="74" ry="68" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M120 152 C 126 84 176 44 214 62 C 244 30 288 56 288 100 C 304 108 302 152 282 156 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="106" y="128" width="188" height="36" rx="18" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="288" cy="52" r="19" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M124 192 C 112 264 148 344 200 344 C 252 344 288 264 276 192 C 262 224 234 244 200 244 C 166 244 138 224 124 192 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M150 216 C 170 198 190 198 200 212 C 210 198 230 198 250 216 C 236 240 212 238 200 226 C 188 238 164 240 150 216 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="204" r="15" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="174" cy="184" rx="13" ry="15" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="226" cy="184" rx="13" ry="15" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="174" cy="186" rx="6" ry="7.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<ellipse cx="226" cy="186" rx="6" ry="7.5" fill="#1e293b" stroke="none" data-colorable="false"/>'
+    },
+    {
+      id:'tree', cat:'xmas', title:'크리스마스 트리',
+      body:
+      '<rect x="176" y="312" width="48" height="62" rx="10" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M200 150 L 330 300 L 70 300 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M200 94 L 300 218 L 100 218 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M200 42 L 270 150 L 130 150 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<polygon points="200,4 207.6,25.5 230.4,26.1 212.4,40 218.8,61.9 200,49 181.2,61.9 187.6,40 169.6,26.1 192.4,25.5" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="150" cy="270" r="14" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="252" cy="272" r="14" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="200" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="158" cy="196" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="242" cy="196" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="118" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M118 252 Q 200 288 282 252" fill="none" stroke-width="3"/>'
+    },
+    {
+      id:'snowman', cat:'xmas', title:'눈사람',
+      body:
+      '<path d="M142 188 L 72 150" fill="none" stroke-width="7"/>' +
+      '<path d="M110 172 L 100 142" fill="none" stroke-width="5"/>' +
+      '<path d="M258 188 L 328 150" fill="none" stroke-width="7"/>' +
+      '<path d="M290 172 L 300 142" fill="none" stroke-width="5"/>' +
+      '<circle cx="200" cy="306" r="82" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="204" r="62" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="112" r="54" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M146 152 C 168 176 232 176 254 152 L 254 176 C 232 200 168 200 146 176 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="148" y="58" width="104" height="18" rx="9" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="168" y="8" width="64" height="52" rx="9" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="180" cy="104" r="7.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="220" cy="104" r="7.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<path d="M200 116 L 238 126 L 200 136 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="182" cy="148" r="3.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="200" cy="154" r="3.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="218" cy="148" r="3.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="200" cy="182" r="9" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="210" r="9" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="238" r="9" fill="#ffffff" data-colorable="true"/>'
+    },
+    {
+      id:'gift', cat:'xmas', title:'선물상자',
+      body:
+      '<path d="M200 146 C 176 104 122 104 118 142 C 114 178 172 176 200 146 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M200 146 C 224 104 278 104 282 142 C 286 178 228 176 200 146 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="66" y="150" width="268" height="56" rx="12" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="86" y="206" width="228" height="154" rx="12" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="178" y="206" width="44" height="154" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="178" y="150" width="44" height="56" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="148" r="20" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="126" cy="268" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="274" cy="268" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="126" cy="316" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="274" cy="316" r="10" fill="#ffffff" data-colorable="true"/>'
+    },
+
+    /* ---------------- 👑 동화·자연 ---------------- */
+    {
+      id:'castle', cat:'tale', title:'마법의 성',
+      body:
+      '<path d="M14 348 Q 200 304 386 348 L 386 386 L 14 386 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="62" y="192" width="76" height="162" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M50 196 L 100 104 L 150 196 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="262" y="192" width="76" height="162" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M250 196 L 300 104 L 350 196 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="138" y="140" width="124" height="214" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="138" y="112" width="30" height="30" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="185" y="112" width="30" height="30" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="232" y="112" width="30" height="30" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M176 352 L 176 280 A 24 24 0 0 1 224 280 L 224 352 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="100" cy="250" r="16" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="300" cy="250" r="16" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="178" r="15" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M100 104 L 100 54" fill="none"/>' +
+      '<path d="M100 58 L 140 70 L 100 82 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M300 104 L 300 54" fill="none"/>' +
+      '<path d="M300 58 L 340 70 L 300 82 Z" fill="#ffffff" data-colorable="true"/>'
+    },
+    {
+      id:'crown', cat:'tale', title:'왕관',
+      body:
+      '<path d="M78 286 L 78 148 L 142 204 L 200 106 L 258 204 L 322 148 L 322 286 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<rect x="68" y="268" width="264" height="62" rx="18" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="299" r="18" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="124" cy="299" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="276" cy="299" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="170" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="116" cy="248" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="284" cy="248" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M48 62 L 52 84 L 74 88 L 52 92 L 48 114 L 44 92 L 22 88 L 44 84 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M350 182 L 354 204 L 376 208 L 354 212 L 350 234 L 346 212 L 324 208 L 346 204 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M322 56 L 325 71 L 340 74 L 325 77 L 322 92 L 319 77 L 304 74 L 319 71 Z" fill="#ffffff" data-colorable="true"/>'
+    },
+    {
+      id:'butterfly', cat:'tale', title:'나비와 꽃',
+      body:
+      '<path d="M48 356 L 48 388" fill="none"/>' +
+      '<circle cx="50" cy="316" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="30" cy="330" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="70" cy="330" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="37" cy="350" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="63" cy="350" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="50" cy="334" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M350 356 L 350 388" fill="none"/>' +
+      '<circle cx="350" cy="316" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="330" cy="330" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="370" cy="330" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="337" cy="350" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="363" cy="350" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="350" cy="334" r="10" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M186 152 C 168 112 146 98 128 92" fill="none"/>' +
+      '<path d="M214 152 C 232 112 254 98 272 92" fill="none"/>' +
+      '<circle cx="124" cy="88" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="276" cy="88" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M188 196 C 130 122 56 132 50 190 C 44 246 118 274 188 244 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M212 196 C 270 122 344 132 350 190 C 356 246 282 274 212 244 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M190 232 C 134 252 86 274 102 316 C 116 352 178 322 192 272 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M210 232 C 266 252 314 274 298 316 C 284 352 222 322 208 272 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<ellipse cx="200" cy="232" rx="19" ry="84" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="200" cy="152" r="23" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="108" cy="192" r="20" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="292" cy="192" r="20" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="138" cy="300" r="14" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="262" cy="300" r="14" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="193" cy="150" r="4" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<circle cx="207" cy="150" r="4" fill="#1e293b" stroke="none" data-colorable="false"/>'
+    },
+    {
+      id:'rainbow', cat:'tale', title:'무지개와 해',
+      body:
+      '<circle cx="326" cy="82" r="44" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M326 22 L 326 2" fill="none" stroke-width="8"/>' +
+      '<path d="M326 142 L 326 162" fill="none" stroke-width="8"/>' +
+      '<path d="M266 82 L 246 82" fill="none" stroke-width="8"/>' +
+      '<path d="M386 82 L 406 82" fill="none" stroke-width="8"/>' +
+      '<path d="M284 40 L 270 26" fill="none" stroke-width="8"/>' +
+      '<path d="M368 124 L 382 138" fill="none" stroke-width="8"/>' +
+      '<path d="M368 40 L 382 26" fill="none" stroke-width="8"/>' +
+      '<path d="M284 124 L 270 138" fill="none" stroke-width="8"/>' +
+      '<path d="M30 320 A 170 170 0 0 1 370 320 L 345 320 A 145 145 0 0 0 55 320 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M55 320 A 145 145 0 0 1 345 320 L 320 320 A 120 120 0 0 0 80 320 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M80 320 A 120 120 0 0 1 320 320 L 295 320 A 95 95 0 0 0 105 320 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M105 320 A 95 95 0 0 1 295 320 L 270 320 A 70 70 0 0 0 130 320 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M26 320 Q 26 290 58 290 Q 64 260 96 262 Q 128 264 132 292 Q 162 296 162 326 L 26 326 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M238 320 Q 238 290 270 290 Q 276 260 308 262 Q 340 264 344 292 Q 374 296 374 326 L 238 326 Z" fill="#ffffff" data-colorable="true"/>'
+    },
+    {
+      id:'whale', cat:'tale', title:'바다 고래',
+      body:
+      '<path d="M318 236 C 354 214 372 184 374 154 C 398 200 390 258 344 288 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M56 244 C 76 168 182 138 258 164 C 310 182 332 216 326 250 C 318 286 280 302 214 302 C 130 302 66 292 56 244 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M74 262 C 116 300 258 304 306 266 C 292 296 254 306 200 306 C 140 306 92 292 74 262 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<path d="M170 294 C 186 328 214 342 236 342 C 220 318 212 304 206 294 Z" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="118" cy="222" r="13" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="118" cy="223" r="5.5" fill="#1e293b" stroke="none" data-colorable="false"/>' +
+      '<path d="M76 252 q 26 22 58 10" fill="none"/>' +
+      '<path d="M148 152 q 10 -8 20 0" fill="none"/>' +
+      '<circle cx="130" cy="112" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="184" cy="112" r="11" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="157" cy="88" r="14" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="122" cy="86" r="8" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="192" cy="86" r="8" fill="#ffffff" data-colorable="true"/>' +
+      '<circle cx="157" cy="58" r="9" fill="#ffffff" data-colorable="true"/>'
+    }
+  ];
+
+  /* ============ DOM ============ */
+  var galleryEl = document.getElementById('gallery');
+  var studioEl = document.getElementById('studio');
+  var tabsEl = document.getElementById('tabs');
+  var gridEl = document.getElementById('grid');
+  var footEl = document.getElementById('foot');
+  var stageEl = document.getElementById('stage');
+  var artEl = document.getElementById('art');
+  var svgSlot = document.getElementById('svgSlot');
+  var brush = document.getElementById('brush');
+  var ctx = brush.getContext('2d');
+  var toolsEl = document.getElementById('tools');
+  var segEl = document.getElementById('seg');
+  var sizesEl = document.getElementById('sizes');
+  var paletteEl = document.getElementById('palette');
+  var titleEl = document.getElementById('studioTitle');
+  var undoBtn = document.getElementById('undoBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var saveBtn = document.getElementById('saveBtn');
+  var backBtn = document.getElementById('backBtn');
+  var toastEl = document.getElementById('toast');
+  var modalEl = document.getElementById('modal');
+
+  /* ============ 상태 ============ */
+  var state = {
+    cat: CATEGORIES[0].id,
+    design: null,
+    mode: 'fill',
+    tool: 'color',
+    hex: COLORS[0][0],
+    sizeIdx: 1,
+    history: [],
+    strokes: [],
+    drawing: null
+  };
+
+  var toastTimer = null;
+
+  /* ============ 유틸 ============ */
+  function svgMarkup(d){
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" ' +
+      'fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" ' +
+      'role="img" aria-label="' + d.title + ' 도안">' + d.body + '</svg>';
+  }
+
+  function findDesign(id){
+    for(var i = 0; i < DESIGNS.length; i++){
+      if(DESIGNS[i].id === id) return DESIGNS[i];
+    }
+    return null;
+  }
+
+  function toast(msg){
+    var studioOpen = !studioEl.classList.contains('hidden');
+    var off = 26;
+    if(studioOpen){
+      var tb = toolsEl.getBoundingClientRect();
+      off = Math.round(tb.height || 0) + 16;
+    }
+    toastEl.style.bottom = 'calc(' + off + 'px + env(safe-area-inset-bottom))';
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1900);
+  }
+
+  /* ============ 갤러리 ============ */
+  function renderTabs(){
+    var html = '';
+    for(var i = 0; i < CATEGORIES.length; i++){
+      var c = CATEGORIES[i];
+      html += '<button class="tab' + (c.id === state.cat ? ' on' : '') + '" data-cat="' + c.id + '">' +
+              '<span class="em">' + c.emoji + '</span>' + c.name + '</button>';
+    }
+    tabsEl.innerHTML = html;
+  }
+
+  function renderGrid(){
+    var list = DESIGNS.filter(function(d){ return d.cat === state.cat; });
+    var html = '';
+    for(var i = 0; i < list.length; i++){
+      var d = list[i];
+      html += '<button class="card" data-id="' + d.id + '" aria-label="' + d.title + ' 색칠하기">' +
+              '<span class="thumb">' + svgMarkup(d) + '</span>' +
+              '<span class="cname">' + d.title + '</span></button>';
+    }
+    gridEl.innerHTML = html;
+  }
+
+  function selectCat(id){
+    state.cat = id;
+    var tabs = tabsEl.querySelectorAll('.tab');
+    for(var i = 0; i < tabs.length; i++){
+      tabs[i].classList.toggle('on', tabs[i].getAttribute('data-cat') === id);
+    }
+    renderGrid();
+  }
+
+  tabsEl.addEventListener('click', function(e){
+    var t = e.target.closest('.tab');
+    if(!t) return;
+    selectCat(t.getAttribute('data-cat'));
+  });
+
+  gridEl.addEventListener('click', function(e){
+    var c = e.target.closest('.card');
+    if(!c) return;
+    var d = findDesign(c.getAttribute('data-id'));
+    if(d) openDesign(d);
+  });
+
+  /* ============ 팔레트 / 모드 ============ */
+  function renderPalette(){
+    var html = '';
+    for(var i = 0; i < COLORS.length; i++){
+      html += '<button class="sw' + (i === 0 ? ' on' : '') + '" data-hex="' + COLORS[i][0] + '" ' +
+              'style="background:' + COLORS[i][0] + '" aria-label="' + COLORS[i][1] + '"></button>';
+    }
+    html += '<button class="sw erase" id="eraserBtn" aria-label="지우개">🧽</button>';
+    paletteEl.innerHTML = html;
+  }
+
+  function markSwatch(btn){
+    var all = paletteEl.querySelectorAll('.sw');
+    for(var i = 0; i < all.length; i++) all[i].classList.remove('on');
+    if(btn) btn.classList.add('on');
+  }
+
+  paletteEl.addEventListener('click', function(e){
+    var b = e.target.closest('.sw');
+    if(!b) return;
+    markSwatch(b);
+    if(b.id === 'eraserBtn'){
+      state.tool = 'eraser';
+    } else {
+      state.tool = 'color';
+      state.hex = b.getAttribute('data-hex');
+    }
+  });
+
+  segEl.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if(!b) return;
+    setMode(b.getAttribute('data-mode'));
+  });
+
+  sizesEl.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if(!b) return;
+    state.sizeIdx = parseInt(b.getAttribute('data-size'), 10) || 0;
+    var all = sizesEl.querySelectorAll('button');
+    for(var i = 0; i < all.length; i++){
+      all[i].classList.toggle('on', all[i] === b);
+    }
+  });
+
+  function setMode(m){
+    state.mode = m;
+    var btns = segEl.querySelectorAll('button');
+    for(var i = 0; i < btns.length; i++){
+      btns[i].classList.toggle('on', btns[i].getAttribute('data-mode') === m);
+    }
+    toolsEl.classList.toggle('brush', m === 'brush');
+    brush.classList.toggle('off', m !== 'brush');
+  }
+
+  /* ============ 색칠 화면 ============ */
+  function openDesign(d){
+    state.design = d;
+    state.history = [];
+    state.strokes = [];
+    state.drawing = null;
+    state.tool = 'color';
+    state.hex = COLORS[0][0];
+    state.sizeIdx = 1;
+
+    markSwatch(paletteEl.querySelector('.sw'));
+    var allSizes = sizesEl.querySelectorAll('button');
+    for(var i = 0; i < allSizes.length; i++){
+      allSizes[i].classList.toggle('on', allSizes[i].getAttribute('data-size') === '1');
+    }
+
+    svgSlot.innerHTML = svgMarkup(d);
+    titleEl.textContent = d.title;
+    setMode('fill');
+    updateUndo();
+    redraw();
+
+    galleryEl.classList.add('hidden');
+    studioEl.classList.remove('hidden');
+    requestAnimationFrame(fitArt);
+  }
+
+  function closeStudio(){
+    if(state.drawing) endStroke(true);
+    studioEl.classList.add('hidden');
+    galleryEl.classList.remove('hidden');
+    window.scrollTo(0, 0);
+  }
+
+  function fitArt(){
+    var r = stageEl.getBoundingClientRect();
+    var side = Math.floor(Math.min(r.width, r.height)) - 6;
+    if(side < 120) side = 120;
+    artEl.style.width = side + 'px';
+    artEl.style.height = side + 'px';
+    sizeCanvas(side);
+  }
+
+  function sizeCanvas(side){
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    var px = Math.max(1, Math.round(side * dpr));
+    if(brush.width !== px || brush.height !== px){
+      brush.width = px;
+      brush.height = px;
+    }
+    redraw();
+  }
+
+  /* ---------- 채우기 ---------- */
+  function fillAt(target){
+    var el = target.closest ? target.closest('[data-colorable]') : null;
+    if(!el) return;
+    if(el.getAttribute('data-colorable') !== 'true') return;
+
+    var color = (state.tool === 'eraser') ? '#ffffff' : state.hex;
+    var prev = el.getAttribute('fill') || '#ffffff';
+    if(String(prev).toLowerCase() === String(color).toLowerCase()) return;
+
+    el.setAttribute('fill', color);
+    state.history.push({kind:'fill', el:el, prev:prev});
+    updateUndo();
+  }
+
+  svgSlot.addEventListener('pointerdown', function(e){
+    if(state.mode !== 'fill') return;
+    e.preventDefault();
+    fillAt(e.target);
+  });
+
+  /* ---------- 크레파스 ---------- */
+  function pt(e){
+    var r = brush.getBoundingClientRect();
+    var x = (e.clientX - r.left) / (r.width || 1);
+    var y = (e.clientY - r.top) / (r.height || 1);
+    return {x: Math.max(-0.05, Math.min(1.05, x)), y: Math.max(-0.05, Math.min(1.05, y))};
+  }
+
+  function paintCtx(s){
+    ctx.globalCompositeOperation = s.erase ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = s.color;
+    ctx.fillStyle = s.color;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(1, s.width * brush.width);
+  }
+
+  function drawDot(s){
+    paintCtx(s);
+    var p = s.points[0];
+    ctx.beginPath();
+    ctx.arc(p.x * brush.width, p.y * brush.height, Math.max(0.6, ctx.lineWidth / 2), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawWhole(s){
+    var pts = s.points;
+    paintCtx(s);
+    if(pts.length < 2){ drawDot(s); return; }
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x * brush.width, pts[0].y * brush.height);
+    for(var i = 1; i < pts.length - 1; i++){
+      var mx = ((pts[i].x + pts[i + 1].x) / 2) * brush.width;
+      var my = ((pts[i].y + pts[i + 1].y) / 2) * brush.height;
+      ctx.quadraticCurveTo(pts[i].x * brush.width, pts[i].y * brush.height, mx, my);
+    }
+    var last = pts[pts.length - 1];
+    ctx.lineTo(last.x * brush.width, last.y * brush.height);
+    ctx.stroke();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawTail(s){
+    var pts = s.points;
+    var n = pts.length;
+    if(n < 2) return;
+    paintCtx(s);
+    ctx.beginPath();
+    if(n === 2){
+      ctx.moveTo(pts[0].x * brush.width, pts[0].y * brush.height);
+      ctx.lineTo(pts[1].x * brush.width, pts[1].y * brush.height);
+    } else {
+      var p0 = pts[n - 3], p1 = pts[n - 2], p2 = pts[n - 1];
+      var ax = ((p0.x + p1.x) / 2) * brush.width, ay = ((p0.y + p1.y) / 2) * brush.height;
+      var bx = ((p1.x + p2.x) / 2) * brush.width, by = ((p1.y + p2.y) / 2) * brush.height;
+      ctx.moveTo(ax, ay);
+      ctx.quadraticCurveTo(p1.x * brush.width, p1.y * brush.height, bx, by);
+    }
+    ctx.stroke();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function redraw(){
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, brush.width, brush.height);
+    ctx.globalCompositeOperation = 'source-over';
+    for(var i = 0; i < state.strokes.length; i++){
+      drawWhole(state.strokes[i]);
+    }
+  }
+
+  function startStroke(e){
+    if(state.mode !== 'brush' || state.drawing) return;
+    e.preventDefault();
+    try { brush.setPointerCapture(e.pointerId); } catch(err) {}
+    var s = {
+      color: state.hex,
+      width: BRUSH_W[state.sizeIdx],
+      erase: state.tool === 'eraser',
+      points: [pt(e)]
+    };
+    state.drawing = s;
+    state.strokes.push(s);
+    drawDot(s);
+  }
+
+  function moveStroke(e){
+    if(!state.drawing) return;
+    e.preventDefault();
+    var p = pt(e);
+    var pts = state.drawing.points;
+    var last = pts[pts.length - 1];
+    var dx = p.x - last.x, dy = p.y - last.y;
+    if((dx * dx + dy * dy) < 0.000004) return;
+    pts.push(p);
+    if(pts.length === 1) drawDot(state.drawing); else drawTail(state.drawing);
+  }
+
+  function endStroke(cancel){
+    if(!state.drawing) return;
+    var s = state.drawing;
+    state.drawing = null;
+    if(cancel){
+      var i = state.strokes.indexOf(s);
+      if(i > -1) state.strokes.splice(i, 1);
+      redraw();
+      return;
+    }
+    if(s.points.length === 1) drawDot(s);
+    else drawWhole(s);
+    state.history.push({kind:'stroke', stroke:s});
+    updateUndo();
+  }
+
+  brush.addEventListener('pointerdown', startStroke);
+  brush.addEventListener('pointermove', moveStroke);
+  brush.addEventListener('pointerup', function(){ endStroke(false); });
+  brush.addEventListener('pointercancel', function(){ endStroke(false); });
+
+  /* ---------- 되돌리기 / 초기화 ---------- */
+  function updateUndo(){
+    undoBtn.disabled = state.history.length === 0;
+  }
+
+  function undo(){
+    if(state.drawing) endStroke(false);
+    var h = state.history.pop();
+    if(!h) return;
+    if(h.kind === 'fill'){
+      h.el.setAttribute('fill', h.prev);
+    } else if(h.kind === 'stroke'){
+      var i = state.strokes.indexOf(h.stroke);
+      if(i > -1) state.strokes.splice(i, 1);
+      redraw();
+    }
+    updateUndo();
+  }
+
+  function clearAll(){
+    var els = svgSlot.querySelectorAll('[data-colorable="true"]');
+    for(var i = 0; i < els.length; i++) els[i].setAttribute('fill', '#ffffff');
+    state.strokes = [];
+    state.history = [];
+    state.drawing = null;
+    redraw();
+    updateUndo();
+    toast('새 도안처럼 지웠어요 ✨');
+  }
+
+  /* ---------- 저장 ---------- */
+  function isIOS(){
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function b64(str){
+    var bytes = new TextEncoder().encode(str);
+    var bin = '';
+    for(var i = 0; i < bytes.length; i += 4096){
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 4096));
+    }
+    return btoa(bin);
+  }
+
+  function saveImage(){
+    var svgEl = svgSlot.querySelector('svg');
+    if(!svgEl) return;
+    var size = 1080;
+    var out = document.createElement('canvas');
+    out.width = size;
+    out.height = size;
+    var octx = out.getContext('2d');
+    octx.fillStyle = '#ffffff';
+    octx.fillRect(0, 0, size, size);
+
+    var clone = svgEl.cloneNode(true);
+    clone.setAttribute('width', size);
+    clone.setAttribute('height', size);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    var src = new XMLSerializer().serializeToString(clone);
+    var img = new Image();
+    img.onload = function(){
+      octx.drawImage(img, 0, 0, size, size);
+      if(state.strokes.length){
+        octx.globalCompositeOperation = 'multiply';
+        octx.drawImage(brush, 0, 0, size, size);
+        octx.globalCompositeOperation = 'source-over';
+      }
+      var url;
+      try { url = out.toDataURL('image/png'); }
+      catch(err){ toast('저장이 안 됐어요 😢'); return; }
+
+      var name = '색칠놀이_' + (state.design ? state.design.title : '그림') + '.png';
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast(isIOS() ? '그림을 열었어요! 길게 눌러 저장해요 📷' : '그림을 저장했어요! 💾');
+    };
+    img.onerror = function(){ toast('저장이 안 됐어요 😢'); };
+    img.src = 'data:image/svg+xml;base64,' + b64(src);
+  }
+
+  /* ---------- 버튼 연결 ---------- */
+  backBtn.addEventListener('click', closeStudio);
+  undoBtn.addEventListener('click', undo);
+  saveBtn.addEventListener('click', saveImage);
+  resetBtn.addEventListener('click', function(){
+    if(state.history.length === 0 && state.strokes.length === 0){
+      toast('아직 칠한 게 없어요 🙂');
+      return;
+    }
+    modalEl.classList.remove('hidden');
+  });
+  document.getElementById('cancelClear').addEventListener('click', function(){
+    modalEl.classList.add('hidden');
+  });
+  document.getElementById('confirmClear').addEventListener('click', function(){
+    modalEl.classList.add('hidden');
+    clearAll();
+  });
+
+  window.addEventListener('resize', function(){
+    if(!studioEl.classList.contains('hidden')) fitArt();
+  });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){ if(!studioEl.classList.contains('hidden')) fitArt(); }, 260);
+  });
+
+  /* ---------- 시작 ---------- */
+  renderTabs();
+  renderGrid();
+  renderPalette();
+  footEl.textContent = '도안 ' + DESIGNS.length + '개 · 손가락으로 톡톡 칠해요 🖍️';
+
+  window.KidsColoring = {
+    designs: DESIGNS,
+    state: state,
+    openDesign: openDesign,
+    setMode: setMode,
+    fillAt: fillAt,
+    undo: undo,
+    clearAll: clearAll,
+    redraw: redraw
+  };
+})();
+</script>
+</body>
+</html>
