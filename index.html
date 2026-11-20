@@ -14,7 +14,7 @@
   /* iOS Safari 는 user-scalable=no 만으로는 더블탭 줌을 막지 못한다. touch-action:manipulation 은
      스크롤·드래그는 그대로 두고 더블탭 줌만 끄는 속성이라 루트와 모든 조작 요소에 둔다. */
   html{-webkit-text-size-adjust:100%;touch-action:manipulation}
-  html,body{-webkit-user-select:none;user-select:none}
+  html,body{-webkit-user-select:none;user-select:none;touch-action:manipulation}
   button,a,.tab,.card,.icbtn,.sw,.seg button,.qlv,.qopt,.tools,.topbar,.modal,.sheet,
   #gallery,#studio,#quiz{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   /* 크레파스 드로잉 영역(.stage·#brush)만 아래 규칙에서 touch-action:none 으로 브라우저 제스처를
