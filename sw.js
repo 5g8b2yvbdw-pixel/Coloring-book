@@ -40,10 +40,19 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+/* 쿼리(?v=2 등)는 캐시 열쇠에서 떼어 같은 파일이 여러 벌 쌓이지 않게 한다 */
+function keyFor(request) {
+  var url = new URL(typeof request === 'string' ? request : request.url);
+  url.search = '';
+  url.hash = '';
+  return url.href;
+}
+
 function putInCache(request, response) {
   if (!response || !response.ok || response.type === 'opaque') return;
+  var key = keyFor(request);
   var copy = response.clone();
-  caches.open(CACHE).then(function (cache) { cache.put(request, copy); }).catch(function () {});
+  caches.open(CACHE).then(function (cache) { cache.put(key, copy); }).catch(function () {});
 }
 
 function fromCacheOrIndex(request) {
