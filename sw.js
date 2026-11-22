@@ -36,6 +36,16 @@ self.addEventListener('activate', function (event) {
           return null;
         }));
       })
+      // 예전 버전이 ?v=2 같은 쿼리 열쇠로 남긴 사본을 지운다(오래된 HTML 이 끼어들지 않도록)
+      .then(function () { return caches.open(CACHE); })
+      .then(function (cache) {
+        return cache.keys().then(function (requests) {
+          return Promise.all(requests.map(function (request) {
+            var url = new URL(request.url);
+            return (url.search || url.hash) ? cache.delete(request) : null;
+          }));
+        });
+      })
       .then(function () { return self.clients.claim(); })
   );
 });
