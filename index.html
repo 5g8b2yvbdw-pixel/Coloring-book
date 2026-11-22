@@ -5,8 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="색칠놀이">
 <meta name="theme-color" content="#eaf5ff">
 <meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <title>🎨 신나는 색칠놀이</title>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -2241,6 +2246,13 @@
   renderGrid();
   renderPalette();
   footEl.textContent = '도안 ' + DESIGNS.length + '개 · 손가락으로 톡톡 칠해요 🖍️';
+
+  /* ---------- 오프라인(PWA) 서비스 워커 등록 ---------- */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('./sw.js').catch(function(){});
+    });
+  }
 
   window.KidsColoring = {
     designs: DESIGNS,
