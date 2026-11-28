@@ -692,7 +692,7 @@
   .bsk.blue{background:linear-gradient(160deg,#dbeafe,#bfdbfe)}
 
   /* ================= ✍️ 따라 쓰기 ================= */
-  .trwrap{position:relative;flex:1 1 auto;min-height:0;width:min(92vw,58vh,440px);aspect-ratio:1/1;
+  .trwrap{position:relative;flex:0 0 auto;width:min(92vw,58vh,440px);aspect-ratio:1/1;
           margin:auto;border-radius:22px;overflow:hidden;background:#fff;
           box-shadow:0 10px 26px rgba(30,41,59,.16)}
   .trwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
@@ -727,6 +727,8 @@
   .ctbox .cttag{position:absolute;font-size:12px}
   .ctvs{font-size:20px;font-weight:900;color:#64748b;flex:0 0 auto}
   .ctq{font-size:17px;font-weight:900;letter-spacing:-.02em;color:#334155;text-align:center;flex:0 0 auto}
+
+  #gWord .gbody,#gBasket .gbody,#gClock .gbody,#gCount .gbody,#gTrace .gbody{justify-content:center}
 
   @media (max-height:640px){
     .gwordpic{font-size:52px}
@@ -1287,7 +1289,6 @@
       <div class="opts2" id="gCtOpts"></div>
     </div>
     <div id="gCtCompare" class="gpanel hidden">
-      <div class="ctq" id="gCtQ">어느 쪽이 더 많을까요?</div>
       <div class="ctpair">
         <div class="ctbox" id="gCtA"></div>
         <div class="ctbox" id="gCtB"></div>
@@ -6179,9 +6180,8 @@
     if(!BAL.running) return;
     var f = gEl('gBalField');
     var r = f.getBoundingClientRect();
-    var mole = e.target.closest ? e.target.closest('.mole') : null;
-    if(mole && mole.parentNode.classList.contains('up') && !mole.parentNode.classList.contains('hit')){
-      var hole = mole.parentNode;
+    var hole = e.target.closest ? e.target.closest('.hole') : null;
+    if(hole && hole.classList.contains('up') && !hole.classList.contains('hit')){
       hole.classList.add('hit');
       setTimeout(function(){ hole.classList.remove('up'); hole.classList.remove('hit'); }, 240);
       BAL.score++; BAL.combo++;
@@ -6249,6 +6249,8 @@
     s.style.top = Math.round(38 + Math.random() * 22) + '%';
     s.style.fontSize = '46px';
     s.setAttribute('data-scale', '1');
+    s.setAttribute('role', 'button');
+    s.setAttribute('aria-label', '스티커 ' + emo);
     gEl('stStage').appendChild(s);
     stSelect(s);
     tone(760, 0.09, 0.12, 'sine');
@@ -6998,6 +7000,12 @@
     }
     ink.addEventListener('pointerdown', function(e){
       if(TR.locked) return;
+      var p0 = pos(e);
+      var c0 = ink.getContext('2d');
+      c0.fillStyle = '#2563eb';
+      c0.beginPath();
+      c0.arc(p0.x, p0.y, Math.max(4, ink.width * 0.013), 0, Math.PI * 2);
+      c0.fill();
       last = pos(e);
       TR.draw = true;
       try{ ink.setPointerCapture(e.pointerId); }catch(err){}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>swipe test</title>
+<style>
+  html,body{margin:0;background:#9aa4b2;height:100%}
+  #f{width:390px;height:844px;border:0;display:block;margin:0 auto;background:#fff}
+  #out{position:fixed;left:0;bottom:0;right:0;margin:0;padding:6px 8px;background:#111;color:#0f0;
+       font:12px/1.35 monospace;white-space:pre-wrap;z-index:9}
+</style>
+</head>
+<body>
+<iframe id="f" src="./index.html?swipetest=1" title="swipe test"></iframe>
+<pre id="out">running…</pre>
+<script>
+var f = document.getElementById('f');
+var IDS = ['home','gallery','studio','quiz','puzzle','gMem','gDiff','gMaze','gPiano','gDot',
+  'gBalloon','gSticker','gAnimal','gWord','gBasket','gTrace','gClock','gCount'];
+var log = [];
+
+function vis(){
+  var d = f.contentDocument, out = [];
+  for(var i = 0; i < IDS.length; i++){
+    var el = d.getElementById(IDS[i]);
+    if(el && !el.classList.contains('hidden')) out.push(IDS[i]);
+  }
+  return out.join(',') || '(none)';
+}
+function tap(el){
+  if(!el) return false;
+  el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:f.contentWindow}));
+  return true;
+}
+function tp(d, x, y){
+  return new Touch({identifier:1, target:d.body, clientX:x, clientY:y, pageX:x, pageY:y,
+                    screenX:x, screenY:y, radiusX:8, radiusY:8, force:1});
+}
+function swipe(d, from, to, steps){
+  var t0 = tp(d, from[0], from[1]);
+  d.dispatchEvent(new TouchEvent('touchstart', {bubbles:true, cancelable:true, touches:[t0], targetTouches:[t0], changedTouches:[t0]}));
+  steps = steps || 3;
+  for(var i = 1; i <= steps; i++){
+    var x = from[0] + (to[0] - from[0]) * i / steps;
+    var y = from[1] + (to[1] - from[1]) * i / steps;
+    var ti = tp(d, x, y);
+    d.dispatchEvent(new TouchEvent('touchmove', {bubbles:true, cancelable:true, touches:[ti], targetTouches:[ti], changedTouches:[ti]}));
+  }
+  var te = tp(d, to[0], to[1]);
+  d.dispatchEvent(new TouchEvent('touchend', {bubbles:true, cancelable:true, touches:[], targetTouches:[], changedTouches:[te]}));
+}
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+async function run(){
+  var d = f.contentDocument;
+  log.push('start=' + vis());
+  tap(d.querySelector('.hcard[data-go="balloon"]'));
+  await wait(400);
+  log.push('balloon=' + vis() + ' hist=' + f.contentWindow.history.length);
+
+  swipe(d, [8, 500], [160, 505]);
+  await wait(700);
+  log.push('edgeSwipe=' + vis());
+
+  tap(d.querySelector('.hcard[data-go="sticker"]'));
+  await wait(400);
+  log.push('sticker=' + vis());
+
+  swipe(d, [200, 400], [210, 620]);
+  await wait(500);
+  log.push('verticalDrag(무시되어야 함)=' + vis());
+
+  swipe(d, [36, 400], [180, 402]);
+  await wait(500);
+  log.push('x36시작(무시되어야 함)=' + vis());
+
+  swipe(d, [8, 400], [70, 402]);
+  await wait(700);
+  log.push('edgeShort70=' + vis());
+
+  tap(d.querySelector('.hcard[data-go="trace"]'));
+  await wait(500);
+  log.push('trace=' + vis());
+  swipe(d, [8, 700], [170, 702]);
+  await wait(700);
+  log.push('trace->swipe=' + vis());
+
+  tap(d.querySelector('.hcard[data-go="coloring"]'));
+  await wait(400);
+  var card = d.querySelector('#grid .card');
+  tap(card);
+  await wait(400);
+  log.push('studio=' + vis());
+  swipe(d, [8, 300], [170, 302]);
+  await wait(700);
+  log.push('studio->swipe=' + vis());
+  document.getElementById('out').textContent = log.join('\n');
+}
+f.addEventListener('load', function(){ setTimeout(function(){ run().catch(function(e){ document.getElementById('out').textContent = log.join('\n') + '\nERROR ' + e; }); }, 600); });
+</script>
+</body>
+</html>
