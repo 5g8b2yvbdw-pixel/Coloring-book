@@ -85,6 +85,48 @@ async function run(){
   await wait(700);
   log.push('trace->swipe=' + vis());
 
+
+  // ---- 풍선 터뜨리기 / 두더지 잡기 점수 확인 ----
+  tap(d.querySelector('.hcard[data-go="balloon"]'));
+  await wait(500);
+  var scoreEl = d.getElementById('gBalScore');
+  // 두더지: 올라온 구멍을 찾아 그 구멍에 pointerdown
+  var upHole = null;
+  for(var tries = 0; tries < 40 && !upHole; tries++){
+    upHole = d.querySelector('#gBalField .hole.up');
+    if(!upHole) await wait(150);
+  }
+  if(upHole){
+    var hr = upHole.getBoundingClientRect();
+    upHole.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true, clientX:hr.left+hr.width/2, clientY:hr.top+hr.height/2, pointerType:'touch'}));
+  }
+  await wait(250);
+  log.push('mole score=' + scoreEl.textContent);
+
+  // 풍선: 모드 바꾸고 실제 풍선 중앙에 pointerdown
+  tap(d.getElementById('gBalSeg').querySelector('[data-mode="balloon"]'));
+  await wait(1500);
+  var b = d.querySelector('#gBalField .bln:not(.pop)');
+  if(b){
+    var br = b.getBoundingClientRect();
+    b.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true, clientX:br.left+br.width/2, clientY:br.top+br.height/2, pointerType:'touch'}));
+  }
+  await wait(250);
+  log.push('balloon exact score=' + scoreEl.textContent);
+
+  // 조금 빗나간 곳(가까운 풍선 잡기): 필드 가장 가까운 풍선에서 45px 오른쪽
+  var b2 = d.querySelector('#gBalField .bln:not(.pop)');
+  if(b2){
+    var b2r = b2.getBoundingClientRect();
+    var fieldEl = d.getElementById('gBalField');
+    fieldEl.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true, clientX:b2r.left+b2r.width/2+45, clientY:b2r.top+b2r.height/2, pointerType:'touch'}));
+  }
+  await wait(250);
+  log.push('near tap score=' + scoreEl.textContent);
+
+  // 종료 팝업까지 기다리지 않고 시간을 당겨 확인
+  log.push('timer=' + d.getElementById('gBalTime').textContent);
+
   tap(d.querySelector('.hcard[data-go="coloring"]'));
   await wait(400);
   var card = d.querySelector('#grid .card');
