@@ -545,6 +545,7 @@
   .ddot.next .dring{animation:dRing 1.05s ease-out infinite}
   @keyframes dRing{0%{opacity:.95;stroke-width:3}100%{opacity:0;stroke-width:13}}
   .dotart{opacity:0;transform-origin:200px 200px}
+  .dtline.done{opacity:0;transition:opacity .6s ease}
   .dotart.show{animation:dReveal .7s cubic-bezier(.2,1.5,.5,1) forwards}
   @keyframes dReveal{0%{opacity:0;transform:scale(.72)}60%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
   .dbar{flex:0 0 auto;display:flex;gap:8px;justify-content:center;min-height:44px}
@@ -4603,8 +4604,8 @@
          a: '<g><path d="M84 302 v16" stroke="#2f9e44" stroke-width="4" fill="none"/><circle cx="84" cy="288" r="7" fill="#ef4444"/><circle cx="76" cy="296" r="7" fill="#ef4444"/><circle cx="92" cy="296" r="7" fill="#ef4444"/><circle cx="84" cy="304" r="7" fill="#ef4444"/><circle cx="84" cy="296" r="5" fill="#ffd93b"/></g>',
          b: '<g><path d="M84 302 v16" stroke="#2f9e44" stroke-width="4" fill="none"/><circle cx="84" cy="288" r="7" fill="#a855f7"/><circle cx="76" cy="296" r="7" fill="#a855f7"/><circle cx="92" cy="296" r="7" fill="#a855f7"/><circle cx="84" cy="304" r="7" fill="#a855f7"/><circle cx="84" cy="296" r="5" fill="#ffd93b"/></g>'},
         {x: 198, y: 188, r: 30,
-         a: '<g fill="#ffb84d"><path d="M168 198 l 10 -22 l 10 22 Z"/><path d="M196 192 l 11 -26 l 11 26 Z"/></g>',
-         b: '<g fill="#ffb84d"><path d="M196 192 l 11 -26 l 11 26 Z"/></g>'}
+         a: '<g fill="#ffb84d"><path d="M168 206 l 9 -20 l 9 20 Z"/><path d="M196 200 l 11 -22 l 11 22 Z"/></g>',
+         b: '<g fill="#ffb84d"><path d="M196 200 l 11 -22 l 11 22 Z"/></g>'}
       ]
     },
     {
@@ -5005,14 +5006,14 @@
         if(x === MZ.C - 1 || st.map[y].charAt(x + 1) === '#') d += 'M' + (X + u) + ' ' + Y + ' v' + u + ' ';
       }
     }
-    var fs = Math.round(u * 0.8);
+    var fs = Math.round(u * 0.95);
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">' +
       '<rect width="' + W + '" height="' + H + '" fill="#fffdf5"/>' +
       '<path d="' + d + '" fill="none" stroke="#334155" stroke-width="' + Math.round(u * 0.24) + '" stroke-linecap="round"/>' +
       '<text x="' + ((MZ.C - 2) * u + u / 2) + '" y="' + ((MZ.R - 2) * u + u / 2 + fs * 0.35) + '" font-size="' + fs + '" text-anchor="middle">' + st.to + '</text>' +
       '<polyline class="mztrail" points="" fill="none" stroke="#93c5fd" stroke-width="' + Math.round(u * 0.4) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<g class="mzplayer"><circle r="' + Math.round(u * 0.36) + '" fill="#ffffff" stroke="#2563eb" stroke-width="' + Math.round(u * 0.1) + '"/>' +
-      '<text font-size="' + Math.round(u * 0.56) + '" text-anchor="middle" y="' + Math.round(u * 0.2) + '">' + st.from + '</text></g>' +
+      '<g class="mzplayer"><circle r="' + Math.round(u * 0.4) + '" fill="#ffffff" stroke="#2563eb" stroke-width="' + Math.round(u * 0.1) + '"/>' +
+      '<text font-size="' + Math.round(u * 0.62) + '" text-anchor="middle" y="' + Math.round(u * 0.22) + '">' + st.from + '</text></g>' +
       '</svg>';
     document.getElementById('gMazeWrap').innerHTML = html;
     MZ.svg = document.querySelector('#gMazeWrap svg');
@@ -5289,12 +5290,13 @@
       pts:[[200,352],[104,262],[58,178],[84,112],[146,90],[200,132],[254,90],[316,112],[342,178],[296,262]],
       art:'<ellipse cx="150" cy="150" rx="16" ry="10" transform="rotate(-30 150 150)" fill="#ffffff" opacity=".55" stroke="none"/>' },
     { id:'house', title:'집', kind:'num', color:'#ffe08a',
-      pts:[[50,210],[200,84],[238,122],[238,92],[286,92],[286,160],[350,210],[350,356],[50,356]],
-      art:'<rect x="160" y="262" width="76" height="94" rx="6" fill="#c98f5e"/>' +
-          '<circle cx="222" cy="312" r="6" fill="#ffe08a" stroke="none"/>' +
-          '<rect x="78" y="240" width="56" height="52" rx="6" fill="#bfe6ff"/>' +
-          '<path d="M106 240 V292 M78 266 H134" stroke="#c98f5e" stroke-width="4"/>' +
-          '<rect x="300" y="240" width="42" height="46" rx="6" fill="#bfe6ff"/>' },
+      pts:[[48,212],[198,84],[352,212],[352,356],[232,356],[232,270],[168,270],[168,356],[48,356]],
+      art:'<path d="M40 218 L198 78 L360 218 Z" fill="#e07a5f"/>' +
+          '<rect x="86" y="238" width="56" height="52" rx="6" fill="#bfe6ff"/>' +
+          '<path d="M114 238 V290 M86 264 H142" stroke="#c98f5e" stroke-width="4"/>' +
+          '<rect x="286" y="238" width="52" height="52" rx="6" fill="#bfe6ff"/>' +
+          '<path d="M312 238 V290 M286 264 H338" stroke="#c98f5e" stroke-width="4"/>' +
+          '<circle cx="216" cy="318" r="7" fill="#c98f5e" stroke="none"/>' },
     { id:'rocket', title:'로켓', kind:'num', color:'#f8fafc',
       pts:[[200,44],[264,142],[264,296],[308,352],[236,336],[164,336],[92,352],[136,296],[136,142]],
       art:'<circle cx="200" cy="164" r="26" fill="#60a5fa"/>' +
@@ -5402,6 +5404,8 @@
     DT.done = true;
     var art = DT.svg.querySelector('.dotart');
     if(art) art.classList.add('show');
+    var line = DT.svg.querySelector('.dtline');
+    if(line) line.classList.add('done');
     var dotsg = DT.svg.querySelector('.dotsg');
     if(dotsg){
       setTimeout(function(){ if(dotsg.parentNode) dotsg.parentNode.removeChild(dotsg); }, 500);
