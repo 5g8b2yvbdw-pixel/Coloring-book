@@ -6103,9 +6103,12 @@
 
   function balEnd(){
     balStop();
-    var msg = (BAL.mode === 'mole')
-      ? '두더지를 ' + BAL.score + '번 잡았어요!'
-      : '풍선을 ' + BAL.score + '개 터뜨렸어요!';
+    var msg;
+    if(BAL.mode === 'mole'){
+      msg = BAL.score > 0 ? ('두더지를 ' + BAL.score + '번 잡았어요!') : '두더지가 도망갔어요. 다시 해 볼까요?';
+    } else {
+      msg = BAL.score > 0 ? ('풍선을 ' + BAL.score + '개 터뜨렸어요!') : '풍선이 하늘로 올라갔어요. 다시 해 볼까요?';
+    }
     showGameWin('🎉', '정말 잘했어요!', msg, function(){ balStart(BAL.mode); });
   }
 
@@ -7338,8 +7341,7 @@
   footEl.textContent = '도안 ' + DESIGNS.length + '개 · 퍼즐 ' + PUZZLES.length + '개 · 손가락으로 톡톡 🖍️';
   var homeFoot = document.getElementById('homefoot');
   if(homeFoot){
-    homeFoot.textContent = '색칠 ' + DESIGNS.length + ' · 퍼즐 ' + PUZZLES.length +
-      ' · 미로 ' + MAZES.length + ' · 점 잇기 ' + DOT_STAGES.length + ' — 모두 인터넷 없이 돼요';
+    homeFoot.textContent = '놀이 8가지 · 배우는 놀이 8가지 — 모두 인터넷 없이 돼요';
   }
   goHome();
 
