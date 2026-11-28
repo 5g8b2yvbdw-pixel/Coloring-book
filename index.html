@@ -6878,7 +6878,7 @@
     c.setLineDash([]);
     /* 3) 손가락이 지나갈 가운데 길 — 완성 판정과 똑같은 모양·위치 */
     c.font = '400 ' + fs + 'px "Apple SD Gothic Neo","Helvetica Neue",sans-serif';
-    c.fillStyle = 'rgba(148,163,184,.55)';
+    c.fillStyle = 'rgba(120,150,190,.42)';
     c.fillText(ch, w / 2, w * 0.54);
     TR.pts = trPathPts(ch, w);
     TR.done = false;
@@ -6956,7 +6956,7 @@
     var d;
     try{ d = k.getContext('2d').getImageData(0, 0, w, w).data; }catch(err){ return; }
     var pts = TR.pts;
-    var rad = Math.max(9, Math.round(w * 0.042));
+    var rad = Math.max(10, Math.round(w * 0.055));
     var stepx = Math.max(2, Math.round(rad / 2));
     var hit = 0, total = pts.length / 2;
     for(var i = 0; i < pts.length; i += 2){
