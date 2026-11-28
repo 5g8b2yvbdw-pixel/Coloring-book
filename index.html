@@ -272,7 +272,29 @@
     flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;gap:8px;
     padding:2px 12px calc(12px + env(safe-area-inset-bottom));overflow:hidden;touch-action:none;
   }
+  .pzhead{display:flex;align-items:center;justify-content:center;gap:9px;row-gap:6px;flex:0 0 auto;flex-wrap:wrap;width:100%;max-width:520px}
   .pzseg{display:flex;gap:5px;padding:4px;background:#e8f0fa;border-radius:15px;flex:0 0 auto}
+  /* 완성 그림 미리보기: 힌트를 켜지 않아도 처음부터 늘 보이는 작은 카드 */
+  .pzpeek{
+    flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px;
+    border-radius:15px;background:#fff;box-shadow:0 0 0 2px #93c5fd,0 3px 10px rgba(30,41,59,.16);
+    transition:transform .12s ease,box-shadow .15s;
+  }
+  .pzpeek:active{transform:scale(.94)}
+  .pzpeek .pkart{display:block;width:54px;height:54px;border-radius:10px;overflow:hidden;background:#f8fafc}
+  .pzpeek .pkart svg{display:block;width:100%;height:100%}
+  .pzpeek .pkcap{font-size:9.5px;font-weight:900;color:#1d4ed8;letter-spacing:-.04em;line-height:1.05}
+  @media (max-height:560px){
+    .pzpeek .pkart{width:40px;height:40px}
+    .pzpeek .pkcap{display:none}
+  }
+  /* 미리보기 크게 보기 팝업 */
+  .pzbigwrap{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:22px;background:rgba(15,23,42,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .pzbigcard{width:min(380px,100%);padding:14px;border-radius:26px;background:#fff;text-align:center;box-shadow:0 24px 60px rgba(15,23,42,.4)}
+  .pzbigart{width:100%;aspect-ratio:1/1;border-radius:18px;overflow:hidden;background:#f8fafc}
+  .pzbigart svg{display:block;width:100%;height:100%}
+  .pzbigcard p{margin:10px 0 12px;font-size:15px;font-weight:900;color:#334155;letter-spacing:-.02em}
+  .pzbigcard .bigclose{width:100%;padding:12px 0;border-radius:14px;background:#2563eb;color:#fff;font-size:15px;font-weight:900;letter-spacing:-.02em;box-shadow:0 6px 16px rgba(37,99,235,.35)}
   .pzseg button{
     padding:7px 11px;border-radius:11px;font-size:12.5px;font-weight:900;letter-spacing:-.03em;
     color:#64748b;white-space:nowrap;transition:background .15s,color .15s;
@@ -461,13 +483,27 @@
     <div class="pzprog" id="pzProg">0/9</div>
   </div>
   <div class="pzstage" id="pzStage">
-    <div class="pzseg" id="pzSeg">
-      <button data-n="2">쉬움 2×2</button>
-      <button data-n="3" class="on">보통 3×3</button>
-      <button data-n="4">어려움 4×4</button>
+    <div class="pzhead" id="pzHead">
+      <div class="pzseg" id="pzSeg">
+        <button data-n="2">쉬움 2×2</button>
+        <button data-n="3" class="on">보통 3×3</button>
+        <button data-n="4">어려움 4×4</button>
+      </div>
+      <button type="button" class="pzpeek" id="pzPeek" aria-label="완성 그림 미리보기" title="완성 그림 미리보기">
+        <span class="pkart" id="pzPeekArt"></span>
+        <span class="pkcap">완성 그림</span>
+      </button>
     </div>
     <div class="pzboard" id="pzBoard"></div>
     <div class="pztray" id="pzTray"></div>
+  </div>
+</div>
+
+<div class="pzbigwrap hidden" id="pzBig">
+  <div class="pzbigcard">
+    <div class="pzbigart" id="pzBigArt"></div>
+    <p id="pzBigCap">완성 그림</p>
+    <button type="button" class="bigclose" id="pzBigClose">닫기</button>
   </div>
 </div>
 
@@ -2747,6 +2783,12 @@
   var pzTray = document.getElementById('pzTray');
   var pzStage = document.getElementById('pzStage');
   var pzSeg = document.getElementById('pzSeg');
+  var pzHead = document.getElementById('pzHead');
+  var pzPeekBtn = document.getElementById('pzPeek');
+  var pzPeekArt = document.getElementById('pzPeekArt');
+  var pzBigEl = document.getElementById('pzBig');
+  var pzBigArt = document.getElementById('pzBigArt');
+  var pzBigCap = document.getElementById('pzBigCap');
   var pzTitleEl = document.getElementById('pzTitle');
   var pzProgEl = document.getElementById('pzProg');
   var pzHintBtn = document.getElementById('pzHintBtn');
@@ -2842,6 +2884,10 @@
     pzHintBtn.classList.remove('on');
     pzBoard.style.setProperty('--n', n);
     pzTray.style.setProperty('--n', n);
+    /* 완성 그림은 힌트와 따로, 퍼즐을 여는 순간부터 작게 늘 보여 준다 */
+    pzPeekArt.innerHTML = pzSvg(pz.puzzle);
+    pzBigArt.innerHTML = pzSvg(pz.puzzle);
+    pzBigCap.textContent = pz.puzzle.title + ' 완성 그림';
 
     var bh = '<div class="pzghost">' + pzSvg(pz.puzzle) + '</div>';
     for(var i = 0; i < total; i++){
@@ -2881,8 +2927,8 @@
     if(puzzleEl.classList.contains('hidden')) return;
     var r = pzStage.getBoundingClientRect();
     if(!r.width || !r.height) return;
-    var segH = pzSeg.offsetHeight || 34;
-    var availH = r.height - segH - 30;     /* 좌우 패딩·간격을 뺀 높이 */
+    var headH = pzHead.offsetHeight || pzSeg.offsetHeight || 40;
+    var availH = r.height - headH - 30;     /* 좌우 패딩·간격을 뺀 높이 */
     var side = Math.floor(Math.min(r.width - 8, availH / 2));
     if(side > 520) side = 520;
     if(side < 150) side = 150;
@@ -3182,6 +3228,7 @@
     pz.press = null;
     puzzleEl.classList.add('hidden');
     pzWinEl.classList.add('hidden');
+    pzBigEl.classList.add('hidden');
     galleryEl.classList.remove('hidden');
     state.cat = 'puzzle';
     renderTabs();
@@ -3195,6 +3242,14 @@
     pzHintBtn.classList.toggle('on', on);
   });
   pzShuffleBtn.addEventListener('click', reshufflePuzzle);
+  pzPeekBtn.addEventListener('click', function(){
+    if(!pz.puzzle) return;
+    pzBigEl.classList.remove('hidden');
+  });
+  pzBigEl.addEventListener('click', function(e){
+    var t = e.target;
+    if(t === pzBigEl || (t && t.closest && t.closest('#pzBigClose'))) pzBigEl.classList.add('hidden');
+  });
   pzSeg.addEventListener('click', function(e){
     var b = e.target.closest('button');
     if(!b) return;

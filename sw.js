@@ -3,7 +3,7 @@
    - 페이지 열기: 네트워크 우선이되 3초 안에 안 되면 캐시로 즉시 열고, 네트워크는 뒤에서 마저 받아 둔다
    - 그 밖의 파일: 캐시 우선 + 뒤에서 조용히 갱신 → 오프라인에서도 100% 열림
    - 새 버전을 올리면 CACHE 이름만 올린다 */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'coloring-book-' + VERSION;
 const NAV_TIMEOUT = 3000;
 
@@ -38,7 +38,7 @@ self.addEventListener('activate', function (event) {
           return null;
         }));
       })
-      // 예전 버전이 ?v=2 같은 쿼리 열쇠로 남긴 사본을 지운다(오래된 HTML 이 끼어들지 않도록)
+      // 예전 버전이 ?v=3 같은 쿼리 열쇠로 남긴 사본을 지운다(오래된 HTML 이 끼어들지 않도록)
       .then(function () { return caches.open(CACHE); })
       .then(function (cache) {
         return cache.keys().then(function (requests) {
