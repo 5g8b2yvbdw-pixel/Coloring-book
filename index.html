@@ -488,6 +488,24 @@
   }
   @media (min-width:680px){ .dfpair{flex-direction:row;aspect-ratio:807/340} }
 
+  /* ---------- 🔍 틀린 그림 찾기 · 그림 고르기 목록 ---------- */
+  .dpwrap{
+    flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    padding:0 12px calc(20px + env(safe-area-inset-bottom));
+  }
+  .dphint{margin:2px 0 12px;text-align:center;font-size:13.5px;font-weight:800;color:#64748b;letter-spacing:-.02em}
+  .dpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;max-width:760px;margin:0 auto}
+  .dpcard{
+    display:flex;flex-direction:column;gap:7px;padding:9px 9px 11px;background:#fff;border-radius:24px;
+    transition:transform .12s ease;box-shadow:0 5px 0 rgba(30,41,59,.06),0 12px 26px rgba(30,41,59,.08);
+  }
+  .dpcard:active{transform:scale(.955)}
+  .dpthumb{display:block;width:100%;aspect-ratio:400/340;border-radius:15px;overflow:hidden;background:#eef6ff}
+  .dpthumb svg{display:block;width:100%;height:100%}
+  .dpmeta{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .dpname{font-size:14.5px;font-weight:900;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .dpbadge{font-size:11.5px;font-weight:900;color:#b45309;background:#fef3c7;border-radius:999px;padding:3px 9px;letter-spacing:-.02em}
+
   /* ================= 🌀 미로 찾기 ================= */
   .mzwrap{
     position:relative;flex:0 0 auto;width:min(90vw,430px,60vh);aspect-ratio:1/1;margin:auto;
@@ -504,6 +522,22 @@
     letter-spacing:-.03em;box-shadow:0 3px 0 rgba(30,41,59,.09);
   }
   .psongs button.on{background:#f59e0b;color:#fff;box-shadow:0 3px 0 rgba(245,158,11,.42)}
+  /* 악보 띠: 곡이 길어지면 한 줄로 옆으로 스크롤하며 지금 칠 음을 가운데에 보여 준다 */
+  .pstrip{
+    position:relative;display:flex;gap:5px;flex:0 0 auto;overflow-x:auto;overflow-y:hidden;
+    padding:2px 2px 7px;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  }
+  .pstrip::-webkit-scrollbar{display:none}
+  .pnote{
+    flex:0 0 auto;min-width:30px;height:27px;padding:0 4px;display:grid;place-items:center;
+    border-radius:9px;background:#fff;font-size:12.5px;font-weight:900;color:#94a3b8;letter-spacing:-.03em;
+    box-shadow:0 2px 0 rgba(30,41,59,.07);transition:background .15s,color .15s,transform .15s;
+  }
+  .pnote.done{background:#e2e8f0;color:#64748b}
+  .pnote.now{
+    background:#f59e0b;color:#fff;transform:translateY(-1px);
+    box-shadow:0 0 0 2px #fbbf24,0 3px 8px rgba(245,158,11,.5);
+  }
   .pkeys{
     position:relative;display:flex;height:min(46vh,290px);padding:6px 6px 8px;touch-action:none;
     border-radius:14px 14px 22px 22px;background:linear-gradient(#1e293b,#0f172a);
@@ -1016,9 +1050,21 @@
 </div>
 
 <!-- ================= 🔍 틀린 그림 찾기 ================= -->
+<!-- 그림 고르기 목록: 홈에서 틀린 그림 찾기를 누르면 먼저 이 화면이 뜬다 -->
+<div id="gDiffPick" class="game hidden">
+  <div class="gtop">
+    <button class="icbtn wide" data-gohome aria-label="놀이터 홈으로">🏠 홈</button>
+    <div class="stitle">🔍 틀린 그림 찾기</div>
+  </div>
+  <div class="dpwrap">
+    <p class="dphint">찾고 싶은 그림을 톡 눌러요!</p>
+    <div class="dpgrid" id="gDiffGrid"></div>
+  </div>
+</div>
 <div id="gDiff" class="game hidden">
   <div class="gtop">
     <button class="icbtn wide" data-gohome aria-label="놀이터 홈으로">🏠 홈</button>
+    <button class="icbtn wide" id="gDiffPickBtn" aria-label="그림 고르기 목록으로">🖼️ 그림</button>
     <div class="stitle" id="gDiffTitle">🔍 틀린 그림 찾기</div>
     <div class="dfcount" id="gDiffCount">0/4</div>
     <button class="icbtn" id="gDiffHint" aria-label="힌트 보기" title="힌트 보기">💡</button>
@@ -1041,7 +1087,10 @@
       <button class="gb green" id="gDiffNext">다음 그림 →</button>
       <button class="gb ghost" id="gDiffWinAgain">다시</button>
     </div>
-    <div class="grow"><button class="gb ghost" data-gohome>🏠 홈으로</button></div>
+    <div class="grow">
+      <button class="gb ghost" id="gDiffWinPick">🖼️ 다른 그림</button>
+      <button class="gb ghost" data-gohome>🏠 홈으로</button>
+    </div>
   </div>
 </div>
 
@@ -1083,12 +1132,9 @@
       <button data-mode="free" class="on">🎵 자유 연주</button>
       <button data-mode="follow">🐣 동요 따라 치기</button>
     </div>
-    <div class="psongs hidden" id="gPianoSongs">
-      <button data-song="0" class="on">반짝반짝 작은별</button>
-      <button data-song="1">나비야</button>
-      <button data-song="2">곰 세 마리</button>
-    </div>
+    <div class="psongs hidden" id="gPianoSongs"></div>
     <div class="pianowrap">
+      <div class="pstrip hidden" id="gPianoStrip" aria-hidden="true"></div>
       <div class="pnext" id="gPianoNext">건반을 눌러 소리를 들어보세요!</div>
       <div class="pkeys" id="gPianoKeys"></div>
     </div>
@@ -4764,7 +4810,7 @@
 
   /* ---------- 화면 이동 ---------- */
   var homeEl = document.getElementById('home');
-  var SCREEN_IDS = ['home', 'gallery', 'studio', 'quiz', 'puzzle', 'gMem', 'gDiff', 'gMaze', 'gPiano', 'gDot',
+  var SCREEN_IDS = ['home', 'gallery', 'studio', 'quiz', 'puzzle', 'gMem', 'gDiffPick', 'gDiff', 'gMaze', 'gPiano', 'gDot',
     'gBalloon', 'gSticker', 'gAnimal', 'gWord', 'gBasket', 'gTrace', 'gClock', 'gCount'];
   var WIN_IDS = ['modal', 'pzWin', 'gMemWin', 'gDiffWin', 'gMazeWin', 'gPianoWin', 'gWin'];
 
@@ -4816,7 +4862,7 @@
     else if(go === 'puzzle') openGallery('puzzle');
     else if(go === 'math') openGallery('math');
     else if(go === 'memory') startMemory(MEM.pairs);
-    else if(go === 'diff') startDiff(DF.i);
+    else if(go === 'diff') openDiffPick();
     else if(go === 'maze') startMaze(MZ.i);
     else if(go === 'piano') startPiano();
     else if(go === 'dots') startDots(DT.i);
@@ -5400,6 +5446,48 @@
     startDiff((DF.i + 1) % DIFF_SCENES.length);
   }
 
+  /* ---------- 그림 고르기 목록 ---------- */
+  var gDiffGrid = document.getElementById('gDiffGrid');
+
+  function renderDiffPick(){
+    var html = '';
+    for(var i = 0; i < DIFF_SCENES.length; i++){
+      var st = DIFF_SCENES[i];
+      html += '<button class="dpcard" data-di="' + i + '" aria-label="' + st.title + ' 틀린 그림 찾기 시작">' +
+        '<span class="dpthumb">' + dfSvg(st, 'a') + '</span>' +
+        '<span class="dpmeta">' +
+          '<span class="dpname">' + st.emoji + ' ' + st.title + '</span>' +
+          '<span class="dpbadge">다른 곳 ' + st.diffs.length + '개</span>' +
+        '</span></button>';
+    }
+    gDiffGrid.innerHTML = html;
+  }
+
+  /* 플레이 중 '그림' 버튼 → 목록으로. 바로 밑에 목록이 쌓여 있으면 그 칸으로 되돌아가고,
+     아니면 목록을 새로 쌓는다. */
+  function openDiffPick(){
+    renderDiffPick();
+    hideAllWins();
+    var wrap = gDiffGrid.parentNode;
+    if(wrap) wrap.scrollTop = 0;
+    var last = NAV.stack.length - 1;
+    if(NAV.stack[last] === 'gDiff' && NAV.stack[last - 1] === 'gDiffPick'){
+      navGoBack();
+      return;
+    }
+    navShow('gDiffPick');
+    navPush('gDiffPick');
+  }
+
+  gDiffGrid.addEventListener('click', function(e){
+    var c = e.target.closest ? e.target.closest('.dpcard') : null;
+    if(!c) return;
+    var i = parseInt(c.getAttribute('data-di'), 10);
+    if(!isNaN(i)) startDiff(i);
+  });
+  document.getElementById('gDiffPickBtn').addEventListener('click', openDiffPick);
+  document.getElementById('gDiffWinPick').addEventListener('click', openDiffPick);
+
   function dfBind(view){
     view.addEventListener('pointerdown', function(e){
       e.preventDefault();
@@ -5639,9 +5727,35 @@
     {after:0, f:277.18}, {after:1, f:311.13}, {after:3, f:369.99}, {after:4, f:415.30}, {after:5, f:466.16}
   ];
   var SONGS = [
-    {title:'반짝반짝 작은별', notes:[0,0,4,4,5,5,4, 3,3,2,2,1,1,0]},
-    {title:'나비야', notes:[4,2,2,3,1,1,0, 1,2,3,4,4,4]},
-    {title:'곰 세 마리', notes:[0,0,0,1,1,1,2,2,2, 2,3,4,2,3,4,1,1,1]}
+    /* 음 번호: 도0 레1 미2 파3 솔4 라5 시6 도'7 — 1절을 끝까지 칠 수 있게 길게 넣었다 */
+    {title:'반짝반짝 작은별', notes:[
+      0,0,4,4,5,5,4, 3,3,2,2,1,1,0,
+      4,4,3,3,2,2,1, 4,4,3,3,2,2,1,
+      0,0,4,4,5,5,4, 3,3,2,2,1,1,0]},
+    {title:'나비야', notes:[
+      4,2,2, 3,1,1, 0,1,2,3,4,4,4,
+      4,2,2,2, 3,1,1, 0,2,4,4, 2,2,2,
+      1,1,1,1, 1,2,3, 2,2,2,2, 2,3,4,
+      4,2,2, 3,1,1, 0,2,4,4, 2,2,2]},
+    {title:'곰 세 마리', notes:[
+      0,0,0,0,0, 2,4,4,2,0,
+      4,4,2, 4,4,2, 0,0,0,
+      4,4,2,0, 4,4,4,
+      4,4,2,0, 4,4,4,
+      4,4,2,0, 4,4,4,5,4,
+      0,4,0,4, 2,1,0]},
+    {title:'학교종', notes:[
+      4,4,5,5,4,4,2, 4,4,2,2,1, 4,4,5,5,4,4,2, 4,2,1,2,0,
+      4,4,5,5,4,4,2, 4,4,2,2,1, 4,4,5,5,4,4,2, 4,2,1,2,0]},
+    {title:'도레미송', notes:[
+      0,1,2,0,2,0,2,      /* 도는 하얀 도화지 */
+      1,2,3,3,2,1,3,      /* 레는 둥근 레코드 */
+      2,3,4,2,4,2,4,      /* 미는 미나리 파릇 */
+      3,4,5,5,4,3,5,      /* 파는 파란 하늘 */
+      4,0,1,2,3,4,5,      /* 솔은 솔방울 방울 */
+      5,1,2,3,4,5,6,      /* 라는 라일락 향기 */
+      6,2,3,4,5,6,7,      /* 시는 시냇물 소리 */
+      7,6,5,3,6,4,7,4,2,1,0]},   /* 다 같이 부르자 */
   ];
   var PB = { mode: 'free', song: 0, pos: 0, on: false };
 
@@ -5649,6 +5763,7 @@
   var gPianoKeys = document.getElementById('gPianoKeys');
   var gPianoNext = document.getElementById('gPianoNext');
   var gPianoSongs = document.getElementById('gPianoSongs');
+  var gPianoStrip = document.getElementById('gPianoStrip');
   var gPianoWin = document.getElementById('gPianoWin');
 
   function buildPiano(){
@@ -5661,6 +5776,44 @@
     }
     gPianoKeys.innerHTML = h;
     placeBlackKeys();
+  }
+
+  /* 동요 칩은 SONGS 에서 그린다(곡을 추가하면 칩도 같이 늘어난다) */
+  function renderSongChips(){
+    var h = '';
+    for(var i = 0; i < SONGS.length; i++){
+      h += '<button data-song="' + i + '"' + (i === PB.song ? ' class="on"' : '') + '>' + SONGS[i].title + '</button>';
+    }
+    gPianoSongs.innerHTML = h;
+  }
+
+  function pbBuildStrip(){
+    if(PB.mode !== 'follow'){
+      gPianoStrip.innerHTML = '';
+      gPianoStrip.classList.add('hidden');
+      return;
+    }
+    var song = SONGS[PB.song];
+    var h = '';
+    for(var i = 0; i < song.notes.length; i++){
+      h += '<span class="pnote">' + WHITE_KEYS[song.notes[i]].n + '</span>';
+    }
+    gPianoStrip.innerHTML = h;
+    gPianoStrip.classList.remove('hidden');
+    pbMarkStrip();
+  }
+
+  function pbMarkStrip(){
+    var notes = gPianoStrip.querySelectorAll('.pnote');
+    if(!notes.length) return;
+    for(var i = 0; i < notes.length; i++){
+      notes[i].className = 'pnote' + (i < PB.pos ? ' done' : (i === PB.pos ? ' now' : ''));
+    }
+    var cur = notes[Math.min(PB.pos, notes.length - 1)];
+    if(!cur) return;
+    var left = cur.offsetLeft - (gPianoStrip.clientWidth - cur.offsetWidth) / 2;
+    try{ gPianoStrip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' }); }
+    catch(err){ gPianoStrip.scrollLeft = Math.max(0, left); }
   }
 
   function placeBlackKeys(){
@@ -5688,6 +5841,8 @@
     } else {
       PB.pos = 0;
       clearTips();
+      gPianoStrip.innerHTML = '';
+      gPianoStrip.classList.add('hidden');
       gPianoNext.textContent = '건반을 눌러 소리를 들어보세요!';
     }
   }
@@ -5705,6 +5860,7 @@
       btns[b].classList.toggle('on', parseInt(btns[b].getAttribute('data-song'), 10) === PB.song);
     }
     gPianoWin.classList.add('hidden');
+    pbBuildStrip();
     pbUpdateTip();
   }
 
@@ -5712,12 +5868,14 @@
     clearTips();
     var song = SONGS[PB.song];
     if(PB.pos >= song.notes.length){
+      pbMarkStrip();
       gPianoNext.textContent = '🎉 ' + song.title + ' 완성!';
       return;
     }
     var k = song.notes[PB.pos];
     var key = gPianoKeys.querySelector('.pwhite[data-k="' + k + '"]');
     if(key) key.classList.add('tip');
+    pbMarkStrip();
     gPianoNext.textContent = '🎵 ' + song.title + ' · 다음은 「' + WHITE_KEYS[k].n + '」 (' + (PB.pos + 1) + '/' + song.notes.length + ')';
   }
 
@@ -5736,7 +5894,7 @@
     var song = SONGS[PB.song];
     if(idx === song.notes[PB.pos]){
       PB.pos++;
-      if(PB.pos >= song.notes.length) pbWin();
+      if(PB.pos >= song.notes.length){ pbMarkStrip(); pbWin(); }
       else pbUpdateTip();
     } else {
       gPianoNext.textContent = '다음은 「' + WHITE_KEYS[song.notes[PB.pos]].n + '」 이에요! 🐣';
@@ -5755,9 +5913,11 @@
 
   function startPiano(){
     if(!gPianoKeys.children.length) buildPiano();
+    renderSongChips();
     pbSetMode(PB.mode);
     navShow('gPiano');
     navPush('gPiano');
+    setTimeout(placeBlackKeys, 60);
   }
 
   gPianoKeys.addEventListener('pointerdown', function(e){
