@@ -465,7 +465,10 @@
   @media (max-height:600px){ .mgrid{gap:6px} .mback b{font-size:20px} }
 
   /* ================= 🔍 틀린 그림 찾기 ================= */
-  .dfpair{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:7px;width:100%;max-width:1000px}
+  .dfpair{
+    flex:0 1 auto;width:100%;max-width:1000px;max-height:100%;margin:auto;aspect-ratio:400/690;
+    display:flex;flex-direction:column;gap:7px;
+  }
   .dfview{
     position:relative;flex:1 1 0;min-height:0;border-radius:18px;overflow:hidden;background:#fff;
     box-shadow:0 6px 18px rgba(30,41,59,.16);touch-action:none;transition:box-shadow .15s;
@@ -483,7 +486,7 @@
     flex:0 0 auto;padding:9px 11px;border-radius:14px;background:#fff;font-size:14px;font-weight:900;
     letter-spacing:-.02em;box-shadow:0 2px 8px rgba(30,41,59,.12);
   }
-  @media (min-width:680px){ .dfpair{flex-direction:row} }
+  @media (min-width:680px){ .dfpair{flex-direction:row;aspect-ratio:807/340} }
 
   /* ================= 🌀 미로 찾기 ================= */
   .mzwrap{
@@ -516,7 +519,7 @@
   .pwhite.tip{background:linear-gradient(#fef9c3,#fde047);box-shadow:0 0 0 4px #f59e0b,inset 0 -5px 0 #f59e0b;animation:pKey .9s ease-in-out infinite}
   @keyframes pKey{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
   .pblack{
-    position:absolute;top:6px;height:56%;border-radius:0 0 9px 9px;z-index:2;
+    position:absolute;top:6px;width:7.4%;height:56%;border-radius:0 0 9px 9px;z-index:2;
     background:linear-gradient(#334155,#0b1220);box-shadow:0 4px 8px rgba(0,0,0,.5);
     transition:transform .05s,background .1s;
   }
@@ -530,7 +533,7 @@
   }
   .dotwrap svg{display:block;width:100%;height:100%;touch-action:none}
   .ddot circle.dc{fill:#fff;stroke:#94a3b8;stroke-width:3.4;transition:fill .15s}
-  .ddot text{font-size:19px;font-weight:900;fill:#475569;text-anchor:middle;dominant-baseline:central}
+  .ddot text{font-size:21px;font-weight:900;fill:#475569;text-anchor:middle;stroke:none}
   .ddot.next circle.dc{fill:#f59e0b;stroke:#b45309}
   .ddot.next text{fill:#fff}
   .ddot.done circle.dc{fill:#2563eb;stroke:#1d4ed8}
@@ -5002,14 +5005,14 @@
         if(x === MZ.C - 1 || st.map[y].charAt(x + 1) === '#') d += 'M' + (X + u) + ' ' + Y + ' v' + u + ' ';
       }
     }
-    var fs = Math.round(u * 0.62);
+    var fs = Math.round(u * 0.8);
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">' +
       '<rect width="' + W + '" height="' + H + '" fill="#fffdf5"/>' +
-      '<path d="' + d + '" fill="none" stroke="#334155" stroke-width="' + Math.round(u * 0.2) + '" stroke-linecap="round"/>' +
+      '<path d="' + d + '" fill="none" stroke="#334155" stroke-width="' + Math.round(u * 0.24) + '" stroke-linecap="round"/>' +
       '<text x="' + ((MZ.C - 2) * u + u / 2) + '" y="' + ((MZ.R - 2) * u + u / 2 + fs * 0.35) + '" font-size="' + fs + '" text-anchor="middle">' + st.to + '</text>' +
       '<polyline class="mztrail" points="" fill="none" stroke="#93c5fd" stroke-width="' + Math.round(u * 0.4) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<g class="mzplayer"><circle r="' + Math.round(u * 0.34) + '" fill="#ffffff" stroke="#2563eb" stroke-width="' + Math.round(u * 0.09) + '"/>' +
-      '<text font-size="' + Math.round(u * 0.46) + '" text-anchor="middle" y="' + Math.round(u * 0.16) + '">' + st.from + '</text></g>' +
+      '<g class="mzplayer"><circle r="' + Math.round(u * 0.36) + '" fill="#ffffff" stroke="#2563eb" stroke-width="' + Math.round(u * 0.1) + '"/>' +
+      '<text font-size="' + Math.round(u * 0.56) + '" text-anchor="middle" y="' + Math.round(u * 0.2) + '">' + st.from + '</text></g>' +
       '</svg>';
     document.getElementById('gMazeWrap').innerHTML = html;
     MZ.svg = document.querySelector('#gMazeWrap svg');
@@ -5349,9 +5352,9 @@
     for(var j = 0; j < st.pts.length; j++){
       var p = st.pts[j];
       h += '<g class="ddot" data-i="' + j + '">' +
-        '<circle class="dring" cx="' + p[0] + '" cy="' + p[1] + '" r="' + 24 + '" opacity="0"/>' +
-        '<circle class="dc" cx="' + p[0] + '" cy="' + p[1] + '" r="17"/>' +
-        '<text x="' + p[0] + '" y="' + (p[1] + 6) + '">' + dotLabel(st, j) + '</text></g>';
+        '<circle class="dring" cx="' + p[0] + '" cy="' + p[1] + '" r="' + 26 + '" opacity="0"/>' +
+        '<circle class="dc" cx="' + p[0] + '" cy="' + p[1] + '" r="18"/>' +
+        '<text x="' + p[0] + '" y="' + (p[1] + 7) + '">' + dotLabel(st, j) + '</text></g>';
     }
     h += '</g></svg>';
     document.getElementById('gDotWrap').innerHTML = h;
@@ -5420,7 +5423,7 @@
     var p = svgPt(DT.svg, e);
     var t = st.pts[DT.idx];
     var dx = p.x - t[0], dy = p.y - t[1];
-    if(dx * dx + dy * dy <= 34 * 34) dotConnect();
+    if(dx * dx + dy * dy <= 36 * 36) dotConnect();
   }
 
   document.getElementById('gDotWrap').addEventListener('pointerdown', function(e){
