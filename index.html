@@ -231,6 +231,115 @@
     .qbig{font-size:44px}
   }
 
+  /* ---------- 퍼즐 (갤러리 카드) ---------- */
+  .pzcard{
+    grid-column:1/-1;display:flex;flex-direction:column;gap:10px;padding:16px 16px 14px;
+    background:linear-gradient(135deg,#eef7ff 0%,#f3fff6 55%,#fff7ed 100%);
+    border:2px dashed #86efac;border-radius:26px;
+    box-shadow:0 5px 0 rgba(30,41,59,.06),0 12px 26px rgba(30,41,59,.10);
+  }
+  .pzcard h2{margin:0;font-size:18px;font-weight:900;letter-spacing:-.03em}
+  .pzcard p{margin:0;font-size:13.5px;font-weight:800;color:#15803d;letter-spacing:-.02em}
+  .pzlevels{display:flex;gap:8px}
+  .pzlv{
+    flex:1 1 0;min-width:0;padding:12px 6px;border-radius:16px;background:#fff;
+    font-size:15px;font-weight:900;letter-spacing:-.03em;color:#334155;
+    box-shadow:0 3px 0 rgba(30,41,59,.10);transition:transform .12s ease,background .15s,color .15s;
+  }
+  .pzlv small{display:block;margin-top:3px;font-size:11.5px;font-weight:800;color:#64748b;letter-spacing:-.02em}
+  .pzlv.on{background:#16a34a;color:#fff;box-shadow:0 3px 0 rgba(22,163,74,.4)}
+  .pzlv.on small{color:#dcfce7}
+  .pzlv:active{transform:scale(.96)}
+
+  /* ---------- 퍼즐 화면 ---------- */
+  #puzzle{
+    position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,#eaf5ff 0%,#f2fff5 100%);
+    touch-action:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;
+  }
+  .pztop{display:flex;align-items:center;gap:6px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top))}
+  .pztop .icbtn{width:40px;height:40px;font-size:18px;border-radius:14px}
+  .pztop .icbtn.on{background:#fde68a;box-shadow:0 0 0 2px #f59e0b,0 2px 8px rgba(245,158,11,.35)}
+  .pzprog{
+    flex:0 0 auto;padding:10px 11px;border-radius:15px;background:#fff;
+    font-size:14.5px;font-weight:900;letter-spacing:-.02em;box-shadow:0 2px 8px rgba(30,41,59,.12);
+  }
+  .pzstage{
+    flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;gap:8px;
+    padding:2px 12px calc(12px + env(safe-area-inset-bottom));overflow:hidden;touch-action:none;
+  }
+  .pzseg{display:flex;gap:5px;padding:4px;background:#e8f0fa;border-radius:15px;flex:0 0 auto}
+  .pzseg button{
+    padding:7px 11px;border-radius:11px;font-size:12.5px;font-weight:900;letter-spacing:-.03em;
+    color:#64748b;white-space:nowrap;transition:background .15s,color .15s;
+  }
+  .pzseg button.on{background:#fff;color:#1e293b;box-shadow:0 2px 8px rgba(30,41,59,.18)}
+  .pzboard{
+    position:relative;flex:0 0 auto;display:grid;gap:2px;padding:4px;border-radius:18px;
+    background:#dbe6f2;box-shadow:0 10px 26px rgba(30,41,59,.16);touch-action:none;
+    grid-template-columns:repeat(var(--n,3),1fr);grid-template-rows:repeat(var(--n,3),1fr);
+    transition:box-shadow .25s ease;
+  }
+  .pzboard.done{box-shadow:0 0 0 4px #fbbf24,0 14px 34px rgba(251,191,36,.5)}
+  .pzghost{position:absolute;inset:4px;opacity:0;pointer-events:none;transition:opacity .22s ease;z-index:0}
+  .pzghost svg{display:block;width:100%;height:100%}
+  .pzboard.hint .pzghost{opacity:.3}
+  .pzcell{
+    position:relative;padding:0;border-radius:8px;overflow:hidden;z-index:1;touch-action:none;
+    background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 2px rgba(148,163,184,.45);
+  }
+  .pzcell.filled{background:#fff;box-shadow:none}
+  .pzcell.done{box-shadow:inset 0 0 0 2px #34d399}
+  .pztray{
+    display:grid;gap:4px;flex:0 0 auto;touch-action:none;
+    grid-template-columns:repeat(var(--n,3),1fr);
+  }
+  .pzslot{
+    position:relative;aspect-ratio:1;border-radius:10px;touch-action:none;
+    background:rgba(255,255,255,.55);box-shadow:inset 0 0 0 2px rgba(148,163,184,.4);
+  }
+  .pzslot.empty{background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 2px rgba(148,163,184,.18)}
+  .pzpiece{
+    position:relative;display:block;padding:0;width:100%;height:100%;overflow:hidden;
+    border-radius:9px;background:#fff;touch-action:none;
+    box-shadow:0 2px 7px rgba(30,41,59,.2);
+    transition:transform .12s ease,box-shadow .15s,opacity .15s;
+  }
+  .pzpiece svg{display:block;width:100%;height:100%}
+  .pzpiece.sel{transform:scale(1.08);z-index:4;box-shadow:0 0 0 3px #2563eb,0 8px 18px rgba(37,99,235,.45)}
+  .pzpiece.dragging{opacity:.28}
+  .pzpiece.locked{box-shadow:none;border-radius:0}
+  .pzpiece.pop{animation:pzPop .5s ease}
+  .pzpiece.nope{animation:pzShake .36s ease}
+  .pzcell .pzpiece{border-radius:0}
+  .pzfloat{
+    position:fixed;z-index:80;pointer-events:none;border-radius:10px;overflow:hidden;
+    box-shadow:0 14px 28px rgba(15,23,42,.45);transform:translate(-50%,-58%);
+  }
+  .pzfloat svg{display:block;width:100%;height:100%}
+  .pzspark{position:absolute;z-index:5;pointer-events:none;font-size:17px;animation:pzSpark .72s ease-out forwards}
+  @keyframes pzShake{0%,100%{transform:translateX(0)}22%{transform:translateX(-5px)}46%{transform:translateX(5px)}70%{transform:translateX(-3px)}}
+  @keyframes pzPop{0%{transform:scale(.84)}55%{transform:scale(1.16)}100%{transform:scale(1)}}
+  @keyframes pzSpark{0%{opacity:1;transform:translate(0,0) scale(.5)}100%{opacity:0;transform:translate(var(--dx,0),var(--dy,-30px)) scale(1.3)}}
+  .pzwin{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:24px;background:rgba(15,23,42,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .pzsheet{
+    position:relative;width:min(340px,100%);padding:24px 20px 18px;background:#fff;
+    border-radius:28px;text-align:center;overflow:hidden;box-shadow:0 24px 60px rgba(15,23,42,.4);
+  }
+  .pzsheet .big{font-size:60px;line-height:1;animation:pzPop .6s ease}
+  .pzsheet h2{margin:8px 0 4px;font-size:24px;font-weight:900;letter-spacing:-.03em}
+  .pzsheet p{margin:0 0 8px;font-size:14px;font-weight:800;color:#64748b;letter-spacing:-.02em}
+  .pzsheet .stars{font-size:22px;letter-spacing:2px;margin-bottom:14px}
+  .pzsheet .row{display:flex;gap:9px}
+  .pzsheet .row button{flex:1 1 0;padding:13px 0;border-radius:16px;font-size:15px;font-weight:900;letter-spacing:-.02em}
+  .pzsheet .row + .row{margin-top:9px}
+  #pzNextBtn{background:#2563eb;color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.4)}
+  #pzAgainBtn{background:#f1f5f9;color:#475569}
+  #pzListBtn{background:#fff;color:#475569;box-shadow:inset 0 0 0 2px #e2e8f0}
+  .pzconfetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  .pzconfetti span{position:absolute;top:-30px;font-size:19px;animation-name:pzFall;animation-timing-function:linear;animation-fill-mode:forwards}
+  @keyframes pzFall{0%{transform:translateY(-30px) rotate(0);opacity:1}100%{transform:translateY(440px) rotate(320deg);opacity:.85}}
+
 </style>
 </head>
 <body>
@@ -247,7 +356,7 @@
 
   <header class="hero">
     <h1>🎨 신나는 색칠놀이</h1>
-    <p>마음에 드는 그림을 골라서 톡톡 칠해보세요! 한글·알파벳·숫자도 배워요 🖍️</p>
+    <p>마음에 드는 그림을 골라서 톡톡 칠해보세요! 한글·알파벳·숫자도 배우고 퍼즐도 맞춰요 🧩</p>
   </header>
   <!-- JS가 실행되지 않는 미리보기에서도 첫 화면이 보이도록 정적 HTML로 미리 그려 둔다.
        JS가 실행되면 renderTabs()/renderGrid()가 같은 내용으로 덮어쓴다. -->
@@ -260,6 +369,7 @@
     <button class="tab" data-cat="xmas"><span class="em">🎄</span>크리스마스</button>
     <button class="tab" data-cat="tale"><span class="em">👑</span>동화·자연</button>
     <button class="tab" data-cat="magic"><span class="em">🪄</span>요정·로봇</button>
+    <button class="tab" data-cat="puzzle"><span class="em">🧩</span>퍼즐</button>
   </nav>
   <main class="grid" id="grid">
     <button class="card" data-id="trex" aria-label="티라노사우루스 색칠하기"><span class="thumb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="티라노사우루스 도안"><path d="M298 210 C 348 202 366 162 374 116 C 396 176 378 250 304 274 Z" fill="#ffffff" data-colorable="true"/><rect x="166" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/><rect x="240" y="260" width="50" height="84" rx="25" fill="#ffffff" data-colorable="true"/><ellipse cx="191" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/><ellipse cx="265" cy="344" rx="38" ry="15" fill="#ffffff" data-colorable="true"/><ellipse cx="228" cy="208" rx="88" ry="86" fill="#ffffff" data-colorable="true"/><ellipse cx="232" cy="262" rx="58" ry="30" fill="#ffffff" data-colorable="true"/><path d="M214 134 L 228 100 L 250 130 Z" fill="#ffffff" data-colorable="true"/><path d="M256 138 L 272 108 L 290 140 Z" fill="#ffffff" data-colorable="true"/><ellipse cx="144" cy="126" rx="78" ry="66" fill="#ffffff" data-colorable="true"/><ellipse cx="148" cy="250" rx="13" ry="19" transform="rotate(28 148 250)" fill="#ffffff" data-colorable="true"/><path d="M72 134 C 106 154 142 156 172 144 C 168 180 118 190 92 172 C 78 162 72 148 72 134 Z" fill="#ffffff" data-colorable="true"/><path d="M108 150 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/><path d="M138 152 l 5 16 l 9 -13 Z" fill="#ffffff" stroke-width="3" data-colorable="false"/><circle cx="118" cy="94" r="17" fill="#ffffff" data-colorable="true"/><circle cx="116" cy="97" r="7" fill="#1e293b" stroke="none" data-colorable="false"/><circle cx="82" cy="118" r="4.5" fill="#1e293b" stroke="none" data-colorable="false"/></svg></span><span class="cname">티라노사우루스</span></button>
@@ -335,6 +445,43 @@
   <div class="qstage" id="qStage"></div>
 </div>
 
+<!-- ================= 퍼즐 ================= -->
+<div id="puzzle" class="hidden">
+  <div class="pztop">
+    <button class="icbtn wide" id="pzBack" aria-label="퍼즐 목록으로">← 퍼즐</button>
+    <div class="stitle" id="pzTitle">🧩 퍼즐</div>
+    <button class="icbtn" id="pzHintBtn" aria-label="힌트 보기" title="힌트 보기">💡</button>
+    <button class="icbtn" id="pzShuffleBtn" aria-label="다시 섞기" title="다시 섞기">🔀</button>
+    <div class="pzprog" id="pzProg">0/9</div>
+  </div>
+  <div class="pzstage" id="pzStage">
+    <div class="pzseg" id="pzSeg">
+      <button data-n="2">쉬움 2×2</button>
+      <button data-n="3" class="on">보통 3×3</button>
+      <button data-n="4">어려움 4×4</button>
+    </div>
+    <div class="pzboard" id="pzBoard"></div>
+    <div class="pztray" id="pzTray"></div>
+  </div>
+</div>
+
+<div class="modal hidden" id="pzWin">
+  <div class="pzsheet">
+    <div class="pzconfetti" id="pzConfetti"></div>
+    <div class="big">🎉</div>
+    <h2>잘했어요! 완성!</h2>
+    <p id="pzWinMsg">퍼즐을 다 맞췄어요</p>
+    <div class="qhint stars" id="pzWinStars">⭐⭐⭐</div>
+    <div class="row">
+      <button id="pzAgainBtn">한 번 더</button>
+      <button id="pzNextBtn">다음 퍼즐 →</button>
+    </div>
+    <div class="row">
+      <button id="pzListBtn">퍼즐 목록</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   'use strict';
@@ -351,7 +498,8 @@
     {id:'car',  emoji:'🚗', name:'탈것'},
     {id:'xmas', emoji:'🎄', name:'크리스마스'},
     {id:'tale', emoji:'👑', name:'동화·자연'},
-    {id:'magic', emoji:'🪄', name:'요정·로봇'}
+    {id:'magic', emoji:'🪄', name:'요정·로봇'},
+    {id:'puzzle', emoji:'🧩', name:'퍼즐'}
   ];
 
   var COLORS = [
@@ -1549,6 +1697,343 @@
     },
   ];
 
+  /* ============ 퍼즐 그림 (색이 채워진 SVG 일러스트, 오프라인 전용) ============ */
+  var PUZZLES = [
+    {
+      id:'pzshark', title:'아기 상어',
+      art:
+      '<rect width="400" height="400" fill="#96dcf7" stroke="none"/>' +
+      '<circle cx="336" cy="70" r="34" fill="#fff3a8" stroke="none"/>' +
+      '<circle cx="60" cy="54" r="22" fill="#ffffff" stroke="none" opacity="0.55"/>' +
+      '<circle cx="96" cy="32" r="14" fill="#ffffff" stroke="none" opacity="0.55"/>' +
+      '<path d="M0 316 Q 54 298 108 316 T 216 316 T 324 316 T 400 310 L 400 400 L 0 400 Z" fill="#ffe2a1"/>' +
+      '<path d="M62 400 C 42 366 64 342 50 308 C 42 290 52 272 64 268" fill="none" stroke="#33a86b" stroke-width="10"/>' +
+      '<path d="M332 400 C 316 372 334 350 324 322 C 318 306 326 292 336 288" fill="none" stroke="#33a86b" stroke-width="10"/>' +
+      '<path d="M300 210 C 336 174 366 158 392 158 C 372 196 372 236 392 266 C 362 274 328 250 300 228 Z" fill="#ffd93b"/>' +
+      '<ellipse cx="196" cy="206" rx="134" ry="84" fill="#ffd93b"/>' +
+      '<path d="M74 226 C 120 262 266 262 312 226 C 302 274 252 294 192 294 C 132 294 84 270 74 226 Z" fill="#fff4b3"/>' +
+      '<path d="M180 126 C 190 82 220 52 260 54 C 240 92 236 112 238 132 Z" fill="#ffd93b"/>' +
+      '<path d="M168 246 C 184 288 216 306 248 298 C 224 274 198 258 176 250 Z" fill="#ffc400"/>' +
+      '<circle cx="126" cy="180" r="26" fill="#ffffff"/>' +
+      '<circle cx="121" cy="183" r="13" fill="#1e293b" stroke="none"/>' +
+      '<circle cx="115" cy="176" r="5" fill="#ffffff" stroke="none"/>' +
+      '<path d="M58 214 C 84 248 132 258 172 242" fill="none"/>' +
+      '<path d="M76 224 l 5 15 l 10 -12 Z" fill="#ffffff" stroke-width="3"/>' +
+      '<path d="M100 234 l 5 15 l 10 -12 Z" fill="#ffffff" stroke-width="3"/>' +
+      '<path d="M124 240 l 5 15 l 10 -12 Z" fill="#ffffff" stroke-width="3"/>' +
+      '<path d="M246 168 q 12 20 2 40" fill="none"/>' +
+      '<path d="M268 170 q 12 20 2 40" fill="none"/>' +
+      '<path d="M290 174 q 12 20 2 38" fill="none"/>' +
+      '<circle cx="212" cy="120" r="10" fill="#ffffff" stroke="none" opacity="0.85"/>' +
+      '<circle cx="238" cy="94" r="7" fill="#ffffff" stroke="none" opacity="0.85"/>' +
+      '<path d="M96 340 l 9 -16 l 9 16 l 16 5 l -12 11 l 3 16 l -16 -9 l -16 9 l 3 -16 l -12 -11 Z" fill="#ff9f68"/>'
+    },
+    {
+      id:'pztrex', title:'티라노사우루스',
+      art:
+      '<rect width="400" height="400" fill="#cdeeff" stroke="none"/>' +
+      '<circle cx="334" cy="70" r="36" fill="#ffe066"/>' +
+      '<path d="M0 300 Q 70 254 150 296 T 300 292 Q 356 288 400 300 L 400 400 L 0 400 Z" fill="#9ade6a"/>' +
+      '<path d="M0 342 Q 90 310 180 342 T 400 336 L 400 400 L 0 400 Z" fill="#7fcc52"/>' +
+      '<path d="M282 244 C 330 228 360 190 372 148 C 392 208 372 270 300 286 Z" fill="#7ed957"/>' +
+      '<rect x="158" y="266" width="48" height="90" rx="24" fill="#7ed957"/>' +
+      '<rect x="238" y="266" width="48" height="90" rx="24" fill="#7ed957"/>' +
+      '<ellipse cx="182" cy="354" rx="38" ry="15" fill="#6cc94a"/>' +
+      '<ellipse cx="262" cy="354" rx="38" ry="15" fill="#6cc94a"/>' +
+      '<ellipse cx="222" cy="212" rx="88" ry="86" fill="#7ed957"/>' +
+      '<ellipse cx="228" cy="252" rx="58" ry="34" fill="#d9f7b4"/>' +
+      '<path d="M214 132 L 228 96 L 250 128 Z" fill="#57b93c"/>' +
+      '<path d="M256 138 L 272 104 L 290 136 Z" fill="#57b93c"/>' +
+      '<ellipse cx="140" cy="128" rx="78" ry="66" fill="#7ed957"/>' +
+      '<ellipse cx="146" cy="248" rx="13" ry="19" transform="rotate(28 146 248)" fill="#7ed957"/>' +
+      '<path d="M64 136 C 100 156 140 158 172 146 C 168 182 116 192 88 174 C 74 164 64 150 64 136 Z" fill="#7ed957"/>' +
+      '<path d="M84 152 l 6 16 l 10 -12 Z" fill="#ffffff" stroke-width="3"/>' +
+      '<path d="M116 154 l 6 16 l 10 -12 Z" fill="#ffffff" stroke-width="3"/>' +
+      '<circle cx="112" cy="96" r="18" fill="#ffffff"/>' +
+      '<circle cx="110" cy="99" r="7" fill="#1e293b" stroke="none"/>' +
+      '<circle cx="78" cy="120" r="5" fill="#1e293b" stroke="none"/>' +
+      '<circle cx="300" cy="86" r="22" fill="#ffffff" stroke="none" opacity="0.75"/>' +
+      '<circle cx="330" cy="102" r="15" fill="#ffffff" stroke="none" opacity="0.75"/>'
+    },
+    {
+      id:'pzunicorn', title:'무지개 유니콘',
+      art:
+      '<rect width="400" height="400" fill="#ffe9f5" stroke="none"/>' +
+      '<circle cx="40" cy="30" r="214" fill="none" stroke="#ff8fa3" stroke-width="16"/>' +
+      '<circle cx="40" cy="30" r="194" fill="none" stroke="#ffbe76" stroke-width="16"/>' +
+      '<circle cx="40" cy="30" r="174" fill="none" stroke="#ffe066" stroke-width="16"/>' +
+      '<circle cx="40" cy="30" r="154" fill="none" stroke="#8ee6a8" stroke-width="16"/>' +
+      '<circle cx="40" cy="30" r="134" fill="none" stroke="#7fcdf5" stroke-width="16"/>' +
+      '<circle cx="40" cy="30" r="114" fill="none" stroke="#b79cf7" stroke-width="16"/>' +
+      '<ellipse cx="200" cy="386" rx="184" ry="44" fill="#d9f7e3"/>' +
+      '<ellipse cx="300" cy="62" rx="46" ry="24" fill="#ffffff" stroke="none"/>' +
+      '<ellipse cx="334" cy="82" rx="34" ry="18" fill="#ffffff" stroke="none"/>' +
+      '<path d="M300 252 C 344 240 360 206 350 174 C 336 206 322 228 296 238 Z" fill="#ff9ecb"/>' +
+      '<rect x="150" y="292" width="28" height="80" rx="14" fill="#ffffff"/>' +
+      '<rect x="186" y="296" width="26" height="76" rx="13" fill="#ffffff"/>' +
+      '<rect x="252" y="296" width="28" height="76" rx="14" fill="#ffffff"/>' +
+      '<rect x="286" y="292" width="28" height="80" rx="14" fill="#ffffff"/>' +
+      '<ellipse cx="222" cy="272" rx="98" ry="60" fill="#ffffff"/>' +
+      '<path d="M172 262 C 156 220 146 182 140 148 L 190 136 C 202 180 212 224 226 262 Z" fill="#ffffff"/>' +
+      '<ellipse cx="146" cy="132" rx="56" ry="44" fill="#ffffff"/>' +
+      '<path d="M186 104 L 206 64 L 216 110 Z" fill="#ffffff"/>' +
+      '<path d="M116 96 L 128 38 L 158 92 Z" fill="#ffd93b"/>' +
+      '<circle cx="186" cy="116" r="20" fill="#ff9ecb"/>' +
+      '<circle cx="198" cy="150" r="22" fill="#ff9ecb"/>' +
+      '<circle cx="204" cy="186" r="22" fill="#ff9ecb"/>' +
+      '<circle cx="212" cy="220" r="20" fill="#ff9ecb"/>' +
+      '<ellipse cx="108" cy="150" rx="26" ry="18" fill="#ffe3f1"/>' +
+      '<circle cx="98" cy="146" r="5" fill="#1e293b" stroke="none"/>' +
+      '<path d="M128 126 q 10 10 20 0" fill="none"/>' +
+      '<circle cx="106" cy="164" r="10" fill="#ffc2dd" stroke="none"/>' +
+      '<rect x="150" y="364" width="28" height="14" rx="6" fill="#cbd5e1"/>' +
+      '<rect x="186" y="366" width="26" height="12" rx="6" fill="#cbd5e1"/>' +
+      '<rect x="252" y="366" width="28" height="12" rx="6" fill="#cbd5e1"/>' +
+      '<rect x="286" y="366" width="28" height="12" rx="6" fill="#cbd5e1"/>' +
+      '<path d="M336 140 l 7 -16 l 7 16 l 16 5 l -12 11 l 3 15 l -14 -8 l -14 8 l 3 -15 l -12 -11 Z" fill="#ffe066"/>'
+    },
+    {
+      id:'pzfire', title:'소방차',
+      art:
+      '<rect width="400" height="400" fill="#d6eeff" stroke="none"/>' +
+      '<circle cx="64" cy="60" r="30" fill="#ffe066"/>' +
+      '<ellipse cx="306" cy="66" rx="48" ry="24" fill="#ffffff" stroke="none"/>' +
+      '<ellipse cx="342" cy="84" rx="32" ry="17" fill="#ffffff" stroke="none"/>' +
+      '<rect x="0" y="296" width="400" height="104" fill="#cbd6e2" stroke="none"/>' +
+      '<path d="M0 330 L400 330" stroke="#ffffff" stroke-width="8" stroke-dasharray="28 24" fill="none"/>' +
+      '<path d="M44 300 L44 262 L36 262 L36 300 Z" fill="#94a3b8"/>' +
+      '<rect x="148" y="168" width="204" height="136" rx="18" fill="#ef4444"/>' +
+      '<rect x="44" y="196" width="126" height="108" rx="16" fill="#ef4444"/>' +
+      '<rect x="60" y="210" width="64" height="48" rx="10" fill="#bfe6ff"/>' +
+      '<rect x="136" y="210" width="12" height="94" rx="5" fill="#dc2626"/>' +
+      '<rect x="86" y="174" width="58" height="20" rx="9" fill="#3b82f6"/>' +
+      '<rect x="150" y="176" width="16" height="18" rx="8" fill="#fca5a5"/>' +
+      '<g transform="rotate(-7 268 150)">' +
+      '<rect x="190" y="126" width="160" height="13" rx="6" fill="#ffd93b"/>' +
+      '<rect x="190" y="158" width="160" height="13" rx="6" fill="#ffd93b"/>' +
+      '<rect x="212" y="132" width="9" height="34" rx="4" fill="#ffd93b"/>' +
+      '<rect x="244" y="132" width="9" height="34" rx="4" fill="#ffd93b"/>' +
+      '<rect x="276" y="132" width="9" height="34" rx="4" fill="#ffd93b"/>' +
+      '<rect x="308" y="132" width="9" height="34" rx="4" fill="#ffd93b"/>' +
+      '<rect x="338" y="132" width="9" height="34" rx="4" fill="#ffd93b"/>' +
+      '</g>' +
+      '<circle cx="316" cy="228" r="28" fill="#ffd93b"/>' +
+      '<circle cx="316" cy="228" r="10" fill="#f4b400"/>' +
+      '<rect x="176" y="234" width="7" height="70" rx="3" fill="#fca5a5"/>' +
+      '<rect x="262" y="234" width="7" height="70" rx="3" fill="#fca5a5"/>' +
+      '<circle cx="52" cy="250" r="12" fill="#fff3a8"/>' +
+      '<circle cx="128" cy="306" r="40" fill="#334155"/>' +
+      '<circle cx="128" cy="306" r="15" fill="#e2e8f0"/>' +
+      '<circle cx="292" cy="306" r="40" fill="#334155"/>' +
+      '<circle cx="292" cy="306" r="15" fill="#e2e8f0"/>' +
+      '<rect x="150" y="176" width="196" height="12" rx="6" fill="#b91c1c"/>'
+    },
+    {
+      id:'pzrocket', title:'우주 로켓',
+      art:
+      '<rect width="400" height="400" fill="#1e2a78" stroke="none"/>' +
+      '<circle cx="54" cy="58" r="4" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="112" cy="34" r="3" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="170" cy="82" r="4" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="252" cy="40" r="3" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="330" cy="120" r="4" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="368" cy="52" r="3" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="34" cy="196" r="3" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="352" cy="244" r="3" fill="#ffffff" stroke="none"/>' +
+      '<path d="M336 168 l 6 -14 l 6 14 l 14 5 l -11 10 l 3 14 l -12 -8 l -12 8 l 3 -14 l -11 -10 Z" fill="#fde68a"/>' +
+      '<circle cx="66" cy="330" r="46" fill="#a78bfa"/>' +
+      '<circle cx="52" cy="316" r="10" fill="#8b5cf6" stroke="none"/>' +
+      '<circle cx="82" cy="344" r="7" fill="#8b5cf6" stroke="none"/>' +
+      '<ellipse cx="66" cy="330" rx="84" ry="16" fill="none" stroke="#ddd6fe" stroke-width="8"/>' +
+      '<path d="M200 44 C 244 90 262 158 262 236 L 138 236 C 138 158 156 90 200 44 Z" fill="#f8fafc"/>' +
+      '<path d="M200 44 C 216 62 230 86 238 116 L 162 116 C 170 86 184 62 200 44 Z" fill="#ef4444"/>' +
+      '<circle cx="200" cy="164" r="32" fill="#7dd3fc"/>' +
+      '<circle cx="200" cy="164" r="20" fill="#38bdf8"/>' +
+      '<path d="M138 200 L 100 274 L 138 254 Z" fill="#ef4444"/>' +
+      '<path d="M262 200 L 300 274 L 262 254 Z" fill="#ef4444"/>' +
+      '<rect x="166" y="236" width="68" height="24" rx="8" fill="#cbd5e1"/>' +
+      '<path d="M200 260 C 226 286 222 318 200 348 C 178 318 170 286 200 260 Z" fill="#fb923c"/>' +
+      '<path d="M200 276 C 214 296 212 318 200 336 C 188 318 186 296 200 276 Z" fill="#fde047"/>' +
+      '<circle cx="126" cy="250" r="12" fill="#ffffff" stroke="none" opacity="0.35"/>' +
+      '<circle cx="106" cy="274" r="8" fill="#ffffff" stroke="none" opacity="0.3"/>'
+    },
+    {
+      id:'pzfairy', title:'하트 요정 공주',
+      art:
+      '<rect width="400" height="400" fill="#ffe8f4" stroke="none"/>' +
+      '<circle cx="330" cy="64" r="26" fill="#fff1b8" stroke="none"/>' +
+      '<ellipse cx="78" cy="80" rx="42" ry="22" fill="#ffffff" stroke="none" opacity="0.85"/>' +
+      '<circle cx="60" cy="140" r="9" fill="#ffe066" stroke="none"/>' +
+      '<circle cx="350" cy="220" r="9" fill="#ffe066" stroke="none"/>' +
+      '<circle cx="40" cy="290" r="7" fill="#f9a8d4" stroke="none"/>' +
+      '<path d="M176 196 C 120 158 76 186 96 232 C 114 272 156 252 176 224 Z" fill="#e0e7ff"/>' +
+      '<path d="M224 196 C 280 158 324 186 304 232 C 286 272 244 252 224 224 Z" fill="#e0e7ff"/>' +
+      '<rect x="128" y="176" width="18" height="54" rx="9" transform="rotate(28 137 203)" fill="#ffe0c4"/>' +
+      '<rect x="254" y="176" width="18" height="54" rx="9" transform="rotate(-28 263 203)" fill="#ffe0c4"/>' +
+      '<path d="M200 148 L 264 322 Q 200 350 136 322 Z" fill="#f472b6"/>' +
+      '<path d="M136 322 Q 200 350 264 322 L 270 344 Q 200 372 130 344 Z" fill="#fbcfe8"/>' +
+      '<path d="M178 150 L 222 150 L 232 222 L 168 222 Z" fill="#ec4899"/>' +
+      '<path d="M168 222 L 232 222 L 236 244 L 164 244 Z" fill="#fbcfe8"/>' +
+      '<circle cx="200" cy="114" r="48" fill="#ffe0c4"/>' +
+      '<path d="M152 106 C 148 56 252 54 248 104 C 248 130 252 142 258 152 C 228 138 172 138 142 152 C 150 140 152 128 152 106 Z" fill="#8b5a2b"/>' +
+      '<path d="M166 70 L 176 40 L 194 62 L 210 38 L 224 64 L 236 72 L 166 72 Z" fill="#ffd93b"/>' +
+      '<circle cx="184" cy="118" r="8" fill="#1e293b" stroke="none"/>' +
+      '<circle cx="216" cy="118" r="8" fill="#1e293b" stroke="none"/>' +
+      '<circle cx="181" cy="115" r="3" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="213" cy="115" r="3" fill="#ffffff" stroke="none"/>' +
+      '<path d="M192 134 q 8 10 16 0" fill="none"/>' +
+      '<circle cx="170" cy="130" r="8" fill="#f9a8d4" stroke="none"/>' +
+      '<circle cx="230" cy="130" r="8" fill="#f9a8d4" stroke="none"/>' +
+      '<path d="M300 258 L 344 180" stroke="#a16207" stroke-width="9" fill="none"/>' +
+      '<path d="M350 180 C 332 164 334 148 344 148 C 350 148 350 156 350 156 C 350 156 350 148 356 148 C 366 148 368 164 350 180 Z" fill="#ef4444"/>' +
+      '<path d="M112 236 C 100 226 102 216 109 216 C 113 216 113 221 113 221 C 113 221 113 216 117 216 C 124 216 125 226 112 236 Z" fill="#f472b6"/>'
+    },
+    {
+      id:'pzrobot', title:'변신 로봇',
+      art:
+      '<rect width="400" height="400" fill="#dcefff" stroke="none"/>' +
+      '<rect x="16" y="146" width="72" height="196" fill="#b7d8ea"/>' +
+      '<rect x="310" y="112" width="74" height="230" fill="#b7d8ea"/>' +
+      '<rect x="30" y="166" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="58" y="166" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="30" y="204" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="58" y="204" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="326" y="136" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="354" y="136" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="326" y="176" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="354" y="176" width="16" height="20" fill="#8fbdd6" stroke="none"/>' +
+      '<rect x="0" y="336" width="400" height="64" fill="#c8dfe8" stroke="none"/>' +
+      '<path d="M200 92 L 200 62" stroke-width="7" fill="none"/>' +
+      '<circle cx="200" cy="54" r="11" fill="#ef4444"/>' +
+      '<rect x="126" y="126" width="18" height="34" rx="8" fill="#94a3b8"/>' +
+      '<rect x="256" y="126" width="18" height="34" rx="8" fill="#94a3b8"/>' +
+      '<rect x="152" y="96" width="96" height="78" rx="16" fill="#60a5fa"/>' +
+      '<rect x="166" y="116" width="68" height="32" rx="14" fill="#0f172a"/>' +
+      '<circle cx="186" cy="132" r="7" fill="#22d3ee" stroke="none"/>' +
+      '<circle cx="214" cy="132" r="7" fill="#22d3ee" stroke="none"/>' +
+      '<rect x="186" y="174" width="28" height="14" fill="#94a3b8"/>' +
+      '<rect x="144" y="186" width="112" height="102" rx="16" fill="#3b82f6"/>' +
+      '<rect x="168" y="210" width="64" height="46" rx="10" fill="#ffd93b"/>' +
+      '<path d="M200 216 l 8 12 l -8 12 l -8 -12 Z" fill="#f59e0b"/>' +
+      '<rect x="106" y="192" width="28" height="82" rx="12" fill="#60a5fa"/>' +
+      '<rect x="266" y="192" width="28" height="82" rx="12" fill="#60a5fa"/>' +
+      '<circle cx="120" cy="288" r="17" fill="#ffd93b"/>' +
+      '<circle cx="280" cy="288" r="17" fill="#ffd93b"/>' +
+      '<rect x="160" y="288" width="34" height="68" rx="14" fill="#60a5fa"/>' +
+      '<rect x="206" y="288" width="34" height="68" rx="14" fill="#60a5fa"/>' +
+      '<rect x="148" y="348" width="58" height="22" rx="10" fill="#1e293b"/>' +
+      '<rect x="194" y="348" width="58" height="22" rx="10" fill="#1e293b"/>' +
+      '<circle cx="176" cy="272" r="7" fill="#22d3ee"/>' +
+      '<circle cx="224" cy="272" r="7" fill="#22d3ee"/>'
+    },
+    {
+      id:'pzcat', title:'고양이',
+      art:
+      '<rect width="400" height="400" fill="#e7f8ee" stroke="none"/>' +
+      '<circle cx="56" cy="70" r="10" fill="#cdeed9" stroke="none"/>' +
+      '<circle cx="46" cy="84" r="6" fill="#cdeed9" stroke="none"/>' +
+      '<circle cx="66" cy="84" r="6" fill="#cdeed9" stroke="none"/>' +
+      '<circle cx="344" cy="120" r="10" fill="#cdeed9" stroke="none"/>' +
+      '<circle cx="334" cy="134" r="6" fill="#cdeed9" stroke="none"/>' +
+      '<circle cx="354" cy="134" r="6" fill="#cdeed9" stroke="none"/>' +
+      '<ellipse cx="200" cy="340" rx="148" ry="46" fill="#c084fc"/>' +
+      '<ellipse cx="200" cy="328" rx="148" ry="44" fill="#d8b4fe"/>' +
+      '<path d="M280 296 C 336 292 356 250 340 210 C 328 250 310 276 274 282 Z" fill="#f7a55b"/>' +
+      '<ellipse cx="200" cy="262" rx="86" ry="66" fill="#f7a55b"/>' +
+      '<ellipse cx="200" cy="292" rx="52" ry="34" fill="#ffe3c4"/>' +
+      '<ellipse cx="160" cy="322" rx="30" ry="20" fill="#f7a55b"/>' +
+      '<ellipse cx="240" cy="322" rx="30" ry="20" fill="#f7a55b"/>' +
+      '<path d="M148 106 L 132 38 L 194 80 Z" fill="#f7a55b"/>' +
+      '<path d="M252 106 L 268 38 L 206 80 Z" fill="#f7a55b"/>' +
+      '<path d="M154 98 L 146 58 L 182 84 Z" fill="#f9a8d4"/>' +
+      '<path d="M246 98 L 254 58 L 218 84 Z" fill="#f9a8d4"/>' +
+      '<circle cx="200" cy="158" r="70" fill="#f7a55b"/>' +
+      '<path d="M186 100 q -8 -18 -16 -24" stroke="#e07b33" stroke-width="9" fill="none"/>' +
+      '<path d="M214 100 q 8 -18 16 -24" stroke="#e07b33" stroke-width="9" fill="none"/>' +
+      '<path d="M168 112 q 6 -14 14 -18" stroke="#e07b33" stroke-width="8" fill="none"/>' +
+      '<path d="M232 112 q -6 -14 -14 -18" stroke="#e07b33" stroke-width="8" fill="none"/>' +
+      '<ellipse cx="200" cy="186" rx="46" ry="32" fill="#fff2e0"/>' +
+      '<ellipse cx="172" cy="146" rx="18" ry="22" fill="#34d399"/>' +
+      '<ellipse cx="228" cy="146" rx="18" ry="22" fill="#34d399"/>' +
+      '<ellipse cx="172" cy="148" rx="8" ry="14" fill="#1e293b" stroke="none"/>' +
+      '<ellipse cx="228" cy="148" rx="8" ry="14" fill="#1e293b" stroke="none"/>' +
+      '<circle cx="168" cy="140" r="4" fill="#ffffff" stroke="none"/>' +
+      '<circle cx="224" cy="140" r="4" fill="#ffffff" stroke="none"/>' +
+      '<path d="M190 174 L 210 174 L 200 186 Z" fill="#f472b6"/>' +
+      '<path d="M200 186 L 200 196" fill="none"/>' +
+      '<path d="M200 196 q -12 12 -22 2" fill="none"/>' +
+      '<path d="M200 196 q 12 12 22 2" fill="none"/>' +
+      '<path d="M154 184 L 112 176" fill="none"/>' +
+      '<path d="M152 196 L 110 198" fill="none"/>' +
+      '<path d="M246 184 L 288 176" fill="none"/>' +
+      '<path d="M248 196 L 290 198" fill="none"/>'
+    },
+    {
+      id:'pzcupcake', title:'컵케이크',
+      art:
+      '<rect width="400" height="400" fill="#fff6cf" stroke="none"/>' +
+      '<circle cx="60" cy="80" r="12" fill="#ffe9a1" stroke="none"/>' +
+      '<circle cx="340" cy="120" r="14" fill="#ffe9a1" stroke="none"/>' +
+      '<circle cx="90" cy="250" r="9" fill="#ffe9a1" stroke="none"/>' +
+      '<circle cx="320" cy="270" r="11" fill="#ffe9a1" stroke="none"/>' +
+      '<ellipse cx="200" cy="352" rx="142" ry="26" fill="#e2e8f0"/>' +
+      '<path d="M130 240 L 270 240 L 250 344 Q 200 358 150 344 Z" fill="#60a5fa"/>' +
+      '<path d="M152 240 L 142 336 Q 152 342 162 344 L 170 240 Z" fill="#93c5fd"/>' +
+      '<path d="M200 240 L 200 352 Q 210 351 218 349 L 214 240 Z" fill="#93c5fd"/>' +
+      '<path d="M246 240 L 254 336 Q 244 341 234 344 L 228 240 Z" fill="#93c5fd"/>' +
+      '<path d="M130 240 C 122 204 150 188 172 198 C 168 162 208 150 224 178 C 244 154 278 170 274 198 C 298 206 292 240 270 242 Z" fill="#f9a8d4"/>' +
+      '<circle cx="200" cy="172" r="26" fill="#fbcfe8"/>' +
+      '<circle cx="200" cy="138" r="17" fill="#ef4444"/>' +
+      '<path d="M200 122 q 8 -24 28 -30" fill="none" stroke="#4d7c0f" stroke-width="7"/>' +
+      '<rect x="156" y="212" width="7" height="16" rx="3" fill="#fde047" transform="rotate(20 159 220)"/>' +
+      '<rect x="236" y="208" width="7" height="15" rx="3" fill="#34d399" transform="rotate(-24 239 215)"/>' +
+      '<rect x="186" y="196" width="7" height="14" rx="3" fill="#a78bfa" transform="rotate(40 189 203)"/>' +
+      '<rect x="218" y="220" width="7" height="14" rx="3" fill="#60a5fa" transform="rotate(-15 221 227)"/>' +
+      '<rect x="262" y="224" width="7" height="14" rx="3" fill="#fb923c" transform="rotate(30 265 231)"/>'
+    },
+    {
+      id:'pztrain', title:'칙칙폭폭 기차',
+      art:
+      '<rect width="400" height="400" fill="#d9f0ff" stroke="none"/>' +
+      '<circle cx="62" cy="58" r="28" fill="#ffe066"/>' +
+      '<ellipse cx="300" cy="60" rx="44" ry="22" fill="#ffffff" stroke="none"/>' +
+      '<ellipse cx="336" cy="78" rx="30" ry="16" fill="#ffffff" stroke="none"/>' +
+      '<path d="M0 296 Q 80 248 160 290 T 320 286 Q 366 284 400 292 L 400 400 L 0 400 Z" fill="#9ade6a"/>' +
+      '<rect x="0" y="336" width="400" height="16" fill="#8b5e3c"/>' +
+      '<rect x="16" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="72" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="128" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="184" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="240" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="296" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="352" y="350" width="18" height="14" fill="#6b4423"/>' +
+      '<rect x="56" y="272" width="292" height="16" rx="8" fill="#475569"/>' +
+      '<rect x="68" y="150" width="112" height="126" rx="14" fill="#3b82f6"/>' +
+      '<rect x="90" y="172" width="68" height="54" rx="12" fill="#bfe6ff"/>' +
+      '<rect x="170" y="200" width="152" height="80" rx="40" fill="#ef4444"/>' +
+      '<rect x="248" y="138" width="38" height="64" rx="10" fill="#334155"/>' +
+      '<rect x="238" y="128" width="58" height="16" rx="8" fill="#334155"/>' +
+      '<rect x="196" y="184" width="36" height="20" rx="10" fill="#ffd93b"/>' +
+      '<circle cx="306" cy="238" r="17" fill="#fde68a"/>' +
+      '<path d="M322 278 L 356 312 L 322 312 Z" fill="#334155"/>' +
+      '<circle cx="110" cy="292" r="40" fill="#334155"/>' +
+      '<circle cx="110" cy="292" r="15" fill="#e2e8f0"/>' +
+      '<circle cx="228" cy="300" r="28" fill="#334155"/>' +
+      '<circle cx="228" cy="300" r="10" fill="#e2e8f0"/>' +
+      '<circle cx="286" cy="300" r="28" fill="#334155"/>' +
+      '<circle cx="286" cy="300" r="10" fill="#e2e8f0"/>' +
+      '<circle cx="268" cy="96" r="22" fill="#ffffff" stroke="none" opacity="0.9"/>' +
+      '<circle cx="296" cy="70" r="26" fill="#ffffff" stroke="none" opacity="0.85"/>' +
+      '<circle cx="330" cy="46" r="18" fill="#ffffff" stroke="none" opacity="0.8"/>'
+    }
+  ];
+
+  var PZ_DIFFS = [
+    {n:2, label:'쉬움', sub:'2×2 · 4조각'},
+    {n:3, label:'보통', sub:'3×3 · 9조각'},
+    {n:4, label:'어려움', sub:'4×4 · 16조각'}
+  ];
+
   /* ============ DOM ============ */
   var galleryEl = document.getElementById('gallery');
   var studioEl = document.getElementById('studio');
@@ -1627,6 +2112,7 @@
   }
 
   function renderGrid(){
+    if(state.cat === 'puzzle'){ gridEl.innerHTML = puzzlePanel(); return; }
     var list = DESIGNS.filter(function(d){ return d.cat === state.cat; });
     var html = (state.cat === 'math') ? quizBanner() : '';
     for(var i = 0; i < list.length; i++){
@@ -1656,6 +2142,14 @@
   gridEl.addEventListener('click', function(e){
     var lv = e.target.closest('.qlv');
     if(lv){ startQuiz(lv.getAttribute('data-level')); return; }
+    var pzLv = e.target.closest('.pzlv');
+    if(pzLv){ setPickSize(parseInt(pzLv.getAttribute('data-n'), 10)); return; }
+    var pzCard = e.target.closest('[data-pz]');
+    if(pzCard){
+      var picked = findPuzzle(pzCard.getAttribute('data-pz'));
+      if(picked) openPuzzle(picked, pickSize);
+      return;
+    }
     var c = e.target.closest('.card');
     if(!c) return;
     var d = findDesign(c.getAttribute('data-id'));
@@ -2241,11 +2735,487 @@
     else closeQuiz();
   });
 
+  /* ============ 퍼즐 맞추기 ============ */
+  var puzzleEl = document.getElementById('puzzle');
+  var pzBoard = document.getElementById('pzBoard');
+  var pzTray = document.getElementById('pzTray');
+  var pzStage = document.getElementById('pzStage');
+  var pzSeg = document.getElementById('pzSeg');
+  var pzTitleEl = document.getElementById('pzTitle');
+  var pzProgEl = document.getElementById('pzProg');
+  var pzHintBtn = document.getElementById('pzHintBtn');
+  var pzShuffleBtn = document.getElementById('pzShuffleBtn');
+  var pzBackBtn = document.getElementById('pzBack');
+  var pzWinEl = document.getElementById('pzWin');
+  var pzWinMsg = document.getElementById('pzWinMsg');
+  var pzWinStars = document.getElementById('pzWinStars');
+  var pzConfetti = document.getElementById('pzConfetti');
+
+  var pickSize = 3;            /* 갤러리에서 고른 난이도 (한 줄 조각 수) */
+  var pz = {
+    puzzle: null, n: 3, cells: [], slots: [], pieces: [],
+    locked: 0, selected: null, done: false, press: null
+  };
+
+  function findPuzzle(id){
+    for(var i = 0; i < PUZZLES.length; i++){
+      if(PUZZLES[i].id === id) return PUZZLES[i];
+    }
+    return null;
+  }
+
+  function pzSvg(p){
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#1e293b" ' +
+      'stroke-width="6" stroke-linecap="round" stroke-linejoin="round" role="img" ' +
+      'aria-label="' + p.title + ' 퍼즐 그림">' + p.art + '</svg>';
+  }
+
+  /* 조각 하나 = 그림 전체를 조각 칸 만큼 잘라 보여 주는 SVG (viewBox 로 잘림) */
+  function pzPieceSvg(p, home, n){
+    var size = 400 / n;
+    var x = (home % n) * size;
+    var y = Math.floor(home / n) * size;
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + x + ' ' + y + ' ' + size + ' ' + size + '" ' +
+      'preserveAspectRatio="xMidYMid slice" fill="none" stroke="#1e293b" stroke-width="6" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p.art + '</svg>';
+  }
+
+  function puzzlePanel(){
+    var h = '<div class="pzcard">' +
+      '<h2>🧩 퍼즐 맞추기</h2>' +
+      '<p>그림 조각을 골라 알맞은 자리에 놓아요!</p>' +
+      '<div class="pzlevels">';
+    for(var i = 0; i < PZ_DIFFS.length; i++){
+      var d = PZ_DIFFS[i];
+      h += '<button class="pzlv' + (d.n === pickSize ? ' on' : '') + '" data-n="' + d.n + '">' +
+           d.label + '<small>' + d.sub + '</small></button>';
+    }
+    h += '</div></div>';
+    for(var j = 0; j < PUZZLES.length; j++){
+      var p = PUZZLES[j];
+      h += '<button class="card" data-pz="' + p.id + '" aria-label="' + p.title + ' 퍼즐 맞추기">' +
+           '<span class="thumb">' + pzSvg(p) + '</span>' +
+           '<span class="cname">' + p.title + '</span></button>';
+    }
+    return h;
+  }
+
+  function setPickSize(n){
+    if(n !== 2 && n !== 3 && n !== 4) return;
+    pickSize = n;
+    renderGrid();
+  }
+
+  function openPuzzle(p, n){
+    pz.puzzle = p;
+    pz.n = (n === 2 || n === 4) ? n : 3;
+    pickSize = pz.n;
+    pz.done = false;
+    pz.selected = null;
+    galleryEl.classList.add('hidden');
+    studioEl.classList.add('hidden');
+    quizEl.classList.add('hidden');
+    puzzleEl.classList.remove('hidden');
+    pzWinEl.classList.add('hidden');
+    var segBtns = pzSeg.querySelectorAll('button');
+    for(var i = 0; i < segBtns.length; i++){
+      segBtns[i].classList.toggle('on', parseInt(segBtns[i].getAttribute('data-n'), 10) === pz.n);
+    }
+    pzTitleEl.textContent = '🧩 ' + p.title;
+    buildPuzzle();
+    requestAnimationFrame(layoutPuzzle);
+  }
+
+  function buildPuzzle(){
+    var n = pz.n, total = n * n;
+    pz.locked = 0;
+    pz.selected = null;
+    pz.done = false;
+    pz.press = null;
+    pzBoard.classList.remove('done', 'hint');
+    pzHintBtn.classList.remove('on');
+    pzBoard.style.setProperty('--n', n);
+    pzTray.style.setProperty('--n', n);
+
+    var bh = '<div class="pzghost">' + pzSvg(pz.puzzle) + '</div>';
+    for(var i = 0; i < total; i++){
+      bh += '<div class="pzcell" data-idx="' + i + '" aria-label="퍼즐 칸 ' + (i + 1) + '"></div>';
+    }
+    pzBoard.innerHTML = bh;
+    pz.cells = pzBoard.querySelectorAll('.pzcell');
+
+    var th = '';
+    for(var s = 0; s < total; s++) th += '<div class="pzslot" data-slot="' + s + '"></div>';
+    pzTray.innerHTML = th;
+    pz.slots = pzTray.querySelectorAll('.pzslot');
+
+    var order = [];
+    for(var k = 0; k < total; k++) order.push(k);
+    shuffle(order);
+
+    pz.pieces = [];
+    for(var q = 0; q < total; q++){
+      var home = order[q];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pzpiece';
+      btn.setAttribute('data-home', home);
+      btn.setAttribute('data-slot', q);
+      btn.setAttribute('aria-label', '퍼즐 조각 ' + (home + 1));
+      btn.innerHTML = pzPieceSvg(pz.puzzle, home, n);
+      pz.slots[q].appendChild(btn);
+      pz.pieces.push(btn);
+    }
+    refreshSlots();
+    updateProg();
+    layoutPuzzle();
+  }
+
+  function layoutPuzzle(){
+    if(puzzleEl.classList.contains('hidden')) return;
+    var r = pzStage.getBoundingClientRect();
+    if(!r.width || !r.height) return;
+    var segH = pzSeg.offsetHeight || 34;
+    var avail = r.height - segH - 26;
+    var side = Math.floor(Math.min(r.width - 6, avail / 2));
+    if(side < 168) side = 168;
+    if(side > 520) side = 520;
+    pzBoard.style.width = side + 'px';
+    pzBoard.style.height = side + 'px';
+    pzTray.style.width = side + 'px';
+  }
+
+  function refreshSlots(){
+    for(var i = 0; i < pz.slots.length; i++){
+      pz.slots[i].classList.toggle('empty', !pz.slots[i].querySelector('.pzpiece'));
+    }
+  }
+
+  function updateProg(){
+    pzProgEl.textContent = '🧩 ' + pz.locked + '/' + (pz.n * pz.n);
+  }
+
+  function locOf(piece){
+    var parent = piece.parentNode;
+    if(parent && parent.classList && parent.classList.contains('pzcell')){
+      return {type:'cell', idx: parseInt(parent.getAttribute('data-idx'), 10)};
+    }
+    return {type:'slot', slot: parseInt(piece.getAttribute('data-slot'), 10)};
+  }
+
+  function clearSel(){
+    if(pz.selected) pz.selected.classList.remove('sel');
+    pz.selected = null;
+  }
+
+  function selectPiece(piece){
+    clearSel();
+    pz.selected = piece;
+    piece.classList.add('sel');
+  }
+
+  function nudge(piece){
+    piece.classList.remove('nope');
+    void piece.offsetWidth;          /* 애니메이션을 다시 시작시키려고 레이아웃을 한 번 읽는다 */
+    piece.classList.add('nope');
+    setTimeout(function(){ piece.classList.remove('nope'); }, 420);
+  }
+
+  function sparkle(cell){
+    var marks = ['✨', '⭐', '✨', '💫'];
+    for(var i = 0; i < marks.length; i++){
+      (function(mark, index){
+        var s = document.createElement('span');
+        s.className = 'pzspark';
+        s.textContent = mark;
+        s.style.left = (10 + Math.random() * 68) + '%';
+        s.style.top = (8 + Math.random() * 58) + '%';
+        s.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px');
+        s.style.setProperty('--dy', (-22 - Math.random() * 26) + 'px');
+        cell.appendChild(s);
+        setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 760);
+      })(marks[i], i);
+    }
+  }
+
+  function lockPiece(piece, cell){
+    if(piece.classList.contains('locked')) return;
+    if(pz.selected === piece) pz.selected = null;
+    piece.classList.remove('sel', 'nope');
+    piece.classList.add('locked', 'pop');
+    cell.classList.add('done', 'filled');
+    pz.locked++;
+    sparkle(cell);
+    setTimeout(function(){ piece.classList.remove('pop'); }, 540);
+    updateProg();
+    if(pz.locked === pz.n * pz.n){
+      pz.done = true;
+      setTimeout(winPuzzle, 640);
+    }
+  }
+
+  function evaluatePiece(piece){
+    var loc = locOf(piece);
+    if(loc.type !== 'cell') return;
+    var home = parseInt(piece.getAttribute('data-home'), 10);
+    if(home === loc.idx) lockPiece(piece, pz.cells[loc.idx]);
+    else nudge(piece);
+  }
+
+  function toSlot(piece){
+    var s = parseInt(piece.getAttribute('data-slot'), 10);
+    if(pz.slots[s]) pz.slots[s].appendChild(piece);
+    piece.classList.remove('sel');
+    if(pz.selected === piece) pz.selected = null;
+    refreshSlots();
+  }
+
+  function place(piece, idx){
+    if(!piece || idx < 0 || idx >= pz.cells.length) return;
+    if(piece.classList.contains('locked')) return;
+    var cell = pz.cells[idx];
+    var occ = cell.querySelector('.pzpiece');
+    if(occ === piece){ clearSel(); return; }
+    if(occ && occ.classList.contains('locked')){ nudge(piece); clearSel(); return; }
+
+    var from = locOf(piece);
+    if(from.type === 'cell') pz.cells[from.idx].classList.remove('filled', 'done');
+    if(piece.parentNode) piece.parentNode.removeChild(piece);
+
+    if(occ){
+      if(occ.parentNode) occ.parentNode.removeChild(occ);
+      if(pz.selected === occ) pz.selected = null;
+      occ.classList.remove('sel');
+      if(from.type === 'cell'){
+        pz.cells[from.idx].appendChild(occ);
+        pz.cells[from.idx].classList.add('filled');
+      } else {
+        var os = parseInt(occ.getAttribute('data-slot'), 10);
+        if(pz.slots[os]) pz.slots[os].appendChild(occ);
+      }
+    }
+
+    cell.appendChild(piece);
+    cell.classList.add('filled');
+    clearSel();
+    refreshSlots();
+    evaluatePiece(piece);
+    if(occ) evaluatePiece(occ);
+    updateProg();
+  }
+
+  function tapPiece(piece){
+    if(!piece) return;
+    if(piece.classList.contains('locked')) return;
+    if(pz.selected && pz.selected !== piece){
+      var loc = locOf(piece);
+      if(loc.type === 'cell'){ place(pz.selected, loc.idx); return; }
+    }
+    if(pz.selected === piece){
+      var here = locOf(piece);
+      if(here.type === 'cell'){
+        var cell = pz.cells[here.idx];
+        toSlot(piece);
+        cell.classList.remove('filled', 'done');
+        return;
+      }
+      clearSel();
+      return;
+    }
+    selectPiece(piece);
+  }
+
+  function tapCell(idx){
+    var cell = pz.cells[idx];
+    if(!cell) return;
+    var occ = cell.querySelector('.pzpiece');
+    if(occ){ tapPiece(occ); return; }
+    if(!pz.selected) return;
+    place(pz.selected, idx);
+  }
+
+  function startFloat(pr, e){
+    var r = pr.piece.getBoundingClientRect();
+    var f = document.createElement('div');
+    f.className = 'pzfloat';
+    f.style.width = r.width + 'px';
+    f.style.height = r.height + 'px';
+    f.style.left = e.clientX + 'px';
+    f.style.top = e.clientY + 'px';
+    f.innerHTML = pr.piece.innerHTML;
+    document.body.appendChild(f);
+    pr.floatEl = f;
+    pr.piece.classList.add('dragging');
+  }
+
+  function dropFloat(pr){
+    if(pr.floatEl && pr.floatEl.parentNode) pr.floatEl.parentNode.removeChild(pr.floatEl);
+    if(pr.piece) pr.piece.classList.remove('dragging');
+  }
+
+  puzzleEl.addEventListener('pointerdown', function(e){
+    if(!pz.puzzle || pz.done) return;
+    var target = e.target;
+    if(!target || !target.closest) return;
+    var piece = target.closest('.pzpiece');
+    var cell = target.closest('.pzcell');
+    if(!piece && !cell) return;
+    e.preventDefault();
+    pz.press = {piece: piece, cell: cell, x: e.clientX, y: e.clientY, moved: false, floatEl: null};
+  }, {passive:false});
+
+  document.addEventListener('pointermove', function(e){
+    var pr = pz.press;
+    if(!pr) return;
+    if(!pr.moved){
+      var dx = e.clientX - pr.x, dy = e.clientY - pr.y;
+      if((dx * dx + dy * dy) < 100) return;
+      if(!pr.piece || pr.piece.classList.contains('locked')){ pz.press = null; return; }
+      pr.moved = true;
+      startFloat(pr, e);
+    }
+    if(pr.floatEl){
+      pr.floatEl.style.left = e.clientX + 'px';
+      pr.floatEl.style.top = e.clientY + 'px';
+      e.preventDefault();
+    }
+  }, {passive:false});
+
+  document.addEventListener('pointerup', function(e){
+    var pr = pz.press;
+    if(!pr) return;
+    pz.press = null;
+    dropFloat(pr);
+    if(pr.moved){
+      if(!pr.piece) return;
+      var over = document.elementFromPoint(e.clientX, e.clientY);
+      var cell = (over && over.closest) ? over.closest('.pzcell') : null;
+      if(cell) place(pr.piece, parseInt(cell.getAttribute('data-idx'), 10));
+      else clearSel();
+      return;
+    }
+    if(pr.piece){ tapPiece(pr.piece); return; }
+    if(pr.cell) tapCell(parseInt(pr.cell.getAttribute('data-idx'), 10));
+  });
+
+  document.addEventListener('pointercancel', function(){
+    var pr = pz.press;
+    if(!pr) return;
+    pz.press = null;
+    dropFloat(pr);
+  });
+
+  function reshufflePuzzle(){
+    if(!pz.puzzle || pz.done) return;
+    /* 아직 맞추지 못한 조각을 모두 트레이로 돌리고 다시 흩뿌린다 */
+    for(var i = 0; i < pz.cells.length; i++){
+      var occ = pz.cells[i].querySelector('.pzpiece');
+      if(occ && !occ.classList.contains('locked')){
+        pz.cells[i].classList.remove('filled', 'done');
+        if(occ.parentNode) occ.parentNode.removeChild(occ);
+      }
+    }
+    var unlocked = [];
+    for(var p = 0; p < pz.pieces.length; p++){
+      var pc = pz.pieces[p];
+      if(pc.classList.contains('locked')) continue;
+      if(pc.parentNode) pc.parentNode.removeChild(pc);
+      pc.classList.remove('sel');
+      unlocked.push(pc);
+    }
+    var pool = [];
+    for(var s = 0; s < pz.slots.length; s++) pool.push(s);
+    shuffle(pool);
+    for(var k = 0; k < unlocked.length; k++){
+      var si = pool[k];
+      unlocked[k].setAttribute('data-slot', si);
+      pz.slots[si].appendChild(unlocked[k]);
+    }
+    clearSel();
+    refreshSlots();
+    toast('조각을 다시 섞었어요 🔀');
+  }
+
+  function winPuzzle(){
+    pz.done = true;
+    pzBoard.classList.add('done');
+    clearSel();
+    var total = pz.n * pz.n;
+    pzWinMsg.textContent = pz.puzzle.title + ' 퍼즐 ' + total + '조각을 모두 맞췄어요!';
+    pzWinStars.textContent = '⭐⭐⭐';
+    pzConfetti.innerHTML = '';
+    var emo = ['🎉', '⭐', '✨', '🌟', '💫', '🎈', '🩷'];
+    for(var c = 0; c < 16; c++){
+      var sp = document.createElement('span');
+      sp.textContent = emo[c % emo.length];
+      sp.style.left = (4 + Math.random() * 92) + '%';
+      sp.style.animationDuration = (1.4 + Math.random() * 1.3) + 's';
+      sp.style.animationDelay = (Math.random() * 0.8) + 's';
+      pzConfetti.appendChild(sp);
+    }
+    pzWinEl.classList.remove('hidden');
+    toast('짝짝짝! 완성 🎉');
+  }
+
+  function nextPuzzle(){
+    var at = 0;
+    for(var i = 0; i < PUZZLES.length; i++){
+      if(PUZZLES[i].id === pz.puzzle.id) at = i;
+    }
+    openPuzzle(PUZZLES[(at + 1) % PUZZLES.length], pz.n);
+  }
+
+  function closePuzzle(){
+    clearSel();
+    pz.press = null;
+    puzzleEl.classList.add('hidden');
+    pzWinEl.classList.add('hidden');
+    galleryEl.classList.remove('hidden');
+    state.cat = 'puzzle';
+    renderTabs();
+    renderGrid();
+    window.scrollTo(0, 0);
+  }
+
+  pzBackBtn.addEventListener('click', closePuzzle);
+  pzHintBtn.addEventListener('click', function(){
+    var on = pzBoard.classList.toggle('hint');
+    pzHintBtn.classList.toggle('on', on);
+  });
+  pzShuffleBtn.addEventListener('click', reshufflePuzzle);
+  pzSeg.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if(!b) return;
+    var n = parseInt(b.getAttribute('data-n'), 10);
+    if(n !== 2 && n !== 3 && n !== 4) return;
+    var all = pzSeg.querySelectorAll('button');
+    for(var i = 0; i < all.length; i++) all[i].classList.toggle('on', all[i] === b);
+    if(!pz.puzzle) return;
+    pz.n = n;
+    pickSize = n;
+    pzWinEl.classList.add('hidden');
+    buildPuzzle();
+    requestAnimationFrame(layoutPuzzle);
+  });
+  document.getElementById('pzAgainBtn').addEventListener('click', function(){
+    pzWinEl.classList.add('hidden');
+    openPuzzle(pz.puzzle, pz.n);
+  });
+  document.getElementById('pzNextBtn').addEventListener('click', nextPuzzle);
+  document.getElementById('pzListBtn').addEventListener('click', closePuzzle);
+
+  window.addEventListener('resize', function(){
+    if(!puzzleEl.classList.contains('hidden')) layoutPuzzle();
+  });
+  window.addEventListener('orientationchange', function(){
+    setTimeout(function(){ if(!puzzleEl.classList.contains('hidden')) layoutPuzzle(); }, 260);
+  });
+
   /* ---------- 시작 ---------- */
   renderTabs();
   renderGrid();
   renderPalette();
-  footEl.textContent = '도안 ' + DESIGNS.length + '개 · 손가락으로 톡톡 칠해요 🖍️';
+  footEl.textContent = '도안 ' + DESIGNS.length + '개 · 퍼즐 ' + PUZZLES.length + '개 · 손가락으로 톡톡 🖍️';
 
   /* ---------- 오프라인(PWA) 서비스 워커 등록 ---------- */
   if ('serviceWorker' in navigator) {
@@ -2256,6 +3226,7 @@
 
   window.KidsColoring = {
     designs: DESIGNS,
+    puzzles: PUZZLES,
     state: state,
     openDesign: openDesign,
     setMode: setMode,
@@ -2263,7 +3234,11 @@
     undo: undo,
     clearAll: clearAll,
     redraw: redraw,
-    startQuiz: startQuiz
+    startQuiz: startQuiz,
+    puzzleState: pz,
+    openPuzzle: openPuzzle,
+    place: place,
+    winPuzzle: winPuzzle
   };
 })();
 </script>
