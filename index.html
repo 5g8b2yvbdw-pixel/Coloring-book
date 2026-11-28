@@ -4612,7 +4612,7 @@
       id: 'sea', title: '바다 속', emoji: '🐠',
       base:
         '<rect width="400" height="340" fill="#a9e8fb"/>' +
-        '<path d="M0 122 H400 V340 H0 Z" fill="#7fd6f2"/>' +
+        '<path d="M0 122 H400 V340 H0 Z" fill="#7fd6f2" stroke="none"/>' +
         '<path d="M70 0 L130 0 L50 340 L0 340 Z" fill="#ffffff" opacity=".2"/>' +
         '<path d="M254 0 L304 0 L234 340 L184 340 Z" fill="#ffffff" opacity=".16"/>' +
         '<path d="M0 292 q 56 -26 112 0 t 112 0 t 112 0 t 64 -4 L400 340 L0 340 Z" fill="#ffe2a1"/>' +
@@ -5010,7 +5010,8 @@
     var html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">' +
       '<rect width="' + W + '" height="' + H + '" fill="#fffdf5"/>' +
       '<path d="' + d + '" fill="none" stroke="#334155" stroke-width="' + Math.round(u * 0.24) + '" stroke-linecap="round"/>' +
-      '<text x="' + ((MZ.C - 2) * u + u / 2) + '" y="' + ((MZ.R - 2) * u + u / 2 + fs * 0.35) + '" font-size="' + fs + '" text-anchor="middle">' + st.to + '</text>' +
+      '<circle cx="' + ((MZ.C - 2) * u + u / 2) + '" cy="' + ((MZ.R - 2) * u + u / 2) + '" r="' + Math.round(u * 0.46) + '" fill="#ffffff" stroke="#16a34a" stroke-width="' + Math.round(u * 0.1) + '" stroke-dasharray="' + Math.round(u * 0.18) + ' ' + Math.round(u * 0.12) + '"/>' +
+      '<text x="' + ((MZ.C - 2) * u + u / 2) + '" y="' + ((MZ.R - 2) * u + u / 2 + fs * 0.3) + '" font-size="' + Math.round(u * 0.7) + '" text-anchor="middle">' + st.to + '</text>' +
       '<polyline class="mztrail" points="" fill="none" stroke="#93c5fd" stroke-width="' + Math.round(u * 0.4) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
       '<g class="mzplayer"><circle r="' + Math.round(u * 0.4) + '" fill="#ffffff" stroke="#2563eb" stroke-width="' + Math.round(u * 0.1) + '"/>' +
       '<text font-size="' + Math.round(u * 0.62) + '" text-anchor="middle" y="' + Math.round(u * 0.22) + '">' + st.from + '</text></g>' +
