@@ -601,17 +601,18 @@
   .gfield::before{content:'☁️';position:absolute;right:12%;top:20%;font-size:20px;opacity:.6;pointer-events:none}
   .moleholes{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);
              grid-template-rows:repeat(3,1fr);gap:6px;padding:10px}
-  .hole{position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-  .hole .dirt{position:absolute;left:6%;right:6%;bottom:14%;height:38%;border-radius:50%;
-              background:radial-gradient(ellipse at 50% 20%,#a16207,#713f12);box-shadow:inset 0 5px 10px rgba(0,0,0,.35)}
-  .hole .mole{position:relative;z-index:2;font-size:min(12vw,58px);line-height:1;transform:translateY(120%);
-              transition:transform .16s cubic-bezier(.2,1.5,.4,1);cursor:pointer;padding:4px}
-  .hole.up .mole{transform:translateY(-4%)}
-  .hole.hit .mole{animation:gHit .3s ease forwards}
-  @keyframes gHit{0%{transform:translateY(-4%) scale(1)}50%{transform:translateY(-4%) scale(1.25)}100%{transform:translateY(120%) scale(.7)}}
+  .hole{position:relative;overflow:hidden;border-radius:18px}
+  .hole .dirt{position:absolute;left:17%;right:17%;bottom:24%;height:26%;border-radius:50%;
+              background:radial-gradient(ellipse at 50% 35%,#a16207 0%,#6b3f16 70%,#4b2a10 100%);
+              box-shadow:inset 0 5px 9px rgba(0,0,0,.45),0 3px 0 rgba(255,255,255,.35)}
+  .hole .mole{position:absolute;left:50%;bottom:17%;font-size:min(11vw,56px);line-height:1;
+              transform:translate(-50%,150%);transition:transform .18s cubic-bezier(.2,1.5,.4,1);cursor:pointer}
+  .hole.up .mole{transform:translate(-50%,0)}
+  .hole.hit .mole{animation:gHit .32s ease forwards}
+  @keyframes gHit{0%{transform:translate(-50%,0) scale(1)}45%{transform:translate(-50%,0) scale(1.22)}100%{transform:translate(-50%,150%) scale(.72)}}
   .bln{position:absolute;bottom:-90px;display:grid;place-items:center;font-size:44px;line-height:1;
        cursor:pointer;will-change:bottom;animation-name:blnRise;animation-timing-function:linear;
-       animation-fill-mode:forwards;padding:4px}
+       animation-fill-mode:forwards;padding:10px}
   @keyframes blnRise{from{bottom:-90px}to{bottom:104%}}
   .bln.pop{animation:blnPop .35s ease forwards;pointer-events:none}
   @keyframes blnPop{0%{transform:scale(1)}55%{transform:scale(1.45);opacity:.9}100%{transform:scale(.2);opacity:0}}
@@ -729,6 +730,7 @@
   .ctq{font-size:17px;font-weight:900;letter-spacing:-.02em;color:#334155;text-align:center;flex:0 0 auto}
 
   #gWord .gbody,#gBasket .gbody,#gClock .gbody,#gCount .gbody,#gTrace .gbody{justify-content:center}
+  #gCtCount,#gCtCompare{justify-content:center}
 
   @media (max-height:640px){
     .gwordpic{font-size:52px}
@@ -6154,7 +6156,7 @@
         b.textContent = emo[Math.floor(Math.random() * emo.length)];
         b.style.left = (3 + Math.random() * 81) + '%';
         b.style.fontSize = Math.round(34 + Math.random() * 16) + 'px';
-        b.style.animationDuration = (4.8 + Math.random() * 2.4).toFixed(2) + 's';
+        b.style.animationDuration = (6.4 + Math.random() * 2.6).toFixed(2) + 's';
         b.addEventListener('animationend', function(){
           if(b.parentNode) b.parentNode.removeChild(b);
           BAL.combo = 0;
@@ -6191,6 +6193,18 @@
       return;
     }
     var bln = e.target.closest ? e.target.closest('.bln') : null;
+    if(!bln && BAL.mode === 'balloon'){
+      var cand = f.querySelectorAll('.bln:not(.pop)');
+      var best = null, bd = 1e9;
+      for(var ci = 0; ci < cand.length; ci++){
+        var cr = cand[ci].getBoundingClientRect();
+        var cdx = e.clientX - (cr.left + cr.width / 2);
+        var cdy = e.clientY - (cr.top + cr.height / 2);
+        var dd = cdx * cdx + cdy * cdy;
+        if(dd < bd){ bd = dd; best = cand[ci]; }
+      }
+      if(best && bd <= 62 * 62) bln = best;
+    }
     if(bln && !bln.classList.contains('pop')){
       bln.classList.add('pop');
       BAL.score++; BAL.combo++;
