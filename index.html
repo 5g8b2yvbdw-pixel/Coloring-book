@@ -6956,7 +6956,7 @@
     var d;
     try{ d = k.getContext('2d').getImageData(0, 0, w, w).data; }catch(err){ return; }
     var pts = TR.pts;
-    var rad = Math.max(10, Math.round(w * 0.055));
+    var rad = Math.max(9, Math.round(w * 0.045));
     var stepx = Math.max(2, Math.round(rad / 2));
     var hit = 0, total = pts.length / 2;
     for(var i = 0; i < pts.length; i += 2){
@@ -6971,7 +6971,7 @@
       if(ok) hit++;
     }
     var ratio = total ? hit / total : 0;
-    if(ratio >= 0.85){ trPraise(); return; }
+    if(ratio >= 0.90){ trPraise(); return; }
     if(ratio >= 0.45 && !TR.nagging){
       TR.nagging = true;
       gEl('trMsg').className = 'gmsg';
