@@ -17,7 +17,7 @@
 <div class="wrap">
   <div class="col">
     <h1>iPhone 390 × 844</h1>
-    <iframe class="dev" id="fr" src="./index.html?m=1"></iframe>
+    <iframe class="dev" id="fr" src="./index.html?m=1&r=0"></iframe>
     <div class="bar" id="bar"></div>
   </div>
 </div>
@@ -39,6 +39,7 @@
     ['dotsHan', 'function(w){w.KidsColoring.startDots(4);}']
   ];
   var fr = document.getElementById('fr');
+  fr.src = './index.html?m=1&r=' + Date.now();
   var bar = document.getElementById('bar');
   acts.forEach(function(a){
     var b = document.createElement('button');
