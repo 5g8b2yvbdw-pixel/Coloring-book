@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>balloon test</title>
+<style>
+  html,body{margin:0;background:#9aa4b2;height:100%}
+  #f{width:390px;height:844px;border:0;display:block;margin:0 auto;background:#fff}
+  #out{position:fixed;left:0;bottom:0;right:0;margin:0;padding:6px 8px;background:#111;color:#0f0;
+       font:12px/1.35 monospace;white-space:pre-wrap;z-index:9}
+</style>
+</head>
+<body>
+<iframe id="f" src="./index.html?bt=1" title="balloon test"></iframe>
+<pre id="out">running…</pre>
+<script>
+var f = document.getElementById('f');
+var log = [];
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function tap(el){ el.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:f.contentWindow})); }
+
+async function run(){
+  var d = f.contentDocument, w = f.contentWindow;
+  tap(d.querySelector('.hcard[data-go="balloon"]'));
+  await wait(500);
+  tap(d.getElementById('gBalSeg').querySelector('[data-mode="balloon"]'));
+  await wait(1800);
+  var field = d.getElementById('gBalField');
+  var score = d.getElementById('gBalScore');
+  var balls = d.querySelectorAll('#gBalField .bln:not(.pop)');
+  log.push('cand=' + balls.length + ' score=' + score.textContent);
+
+  // 1) 풍선 한가운데
+  var b = balls[0], br = b.getBoundingClientRect();
+  b.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true, cancelable:true,
+    clientX: br.left + br.width/2, clientY: br.top + br.height/2, pointerType:'touch', isPrimary:true}));
+  await wait(200);
+  log.push('중앙 탭 -> ' + score.textContent);
+
+  // 2) 45px 빗나간 곳
+  var rest = d.querySelectorAll('#gBalField .bln:not(.pop)');
+  var b2 = rest[0], b2r = b2.getBoundingClientRect();
+  var tx = b2r.left + b2r.width/2 + 45, ty = b2r.top + b2r.height/2;
+  log.push('목표=(' + Math.round(tx) + ',' + Math.round(ty) + ') 풍선중심=(' +
+           Math.round(b2r.left + b2r.width/2) + ',' + Math.round(b2r.top + b2r.height/2) + ') 크기=' +
+           Math.round(b2r.width) + 'x' + Math.round(b2r.height));
+  field.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true, cancelable:true,
+    clientX: tx, clientY: ty, pointerType:'touch', isPrimary:true}));
+  await wait(200);
+  log.push('45px 빗나간 탭 -> ' + score.textContent);
+
+  // 3) onClick 기록이 오는지 (이벤트 흐름 확인)
+  var seen = 0;
+  field.addEventListener('pointerdown', function(){ seen++; });
+  field.dispatchEvent(new PointerEvent('pointerdown', {bubbles:true, clientX:10, clientY:10}));
+  log.push('pointerdown 수신=' + seen);
+  document.getElementById('out').textContent = log.join('\n');
+}
+f.addEventListener('load', function(){
+  setTimeout(function(){ run().catch(function(e){ document.getElementById('out').textContent = log.join('\n') + '\nERR ' + e; }); }, 600);
+});
+</script>
+</body>
+</html>
